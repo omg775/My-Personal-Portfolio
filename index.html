@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Om Gawde — Portfolio</title>
+  <meta name="description" content="Om Gawde — Full-stack developer building elegant web applications, backend systems, and creative developer experiences." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- CANVAS LAYER: stars + noise -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+  <!-- AURORA GLOW ORBS -->
+  <div class="aurora" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+
+  <!-- ========================
+       MENU BAR
+       ======================== -->
+  <nav class="menu-bar" role="navigation" aria-label="macOS Menu Bar">
+    <div class="menu-left">
+      <span class="apple-logo" aria-hidden="true">&#63743;</span>
+      <span class="menu-brand">Om Gawde</span>
+      <span class="menu-divider" aria-hidden="true"></span>
+      <span class="menu-item" tabindex="0">Portfolio</span>
+      <span class="menu-item" tabindex="0">Work</span>
+      <span class="menu-item" tabindex="0">Contact</span>
+    </div>
+    <div class="menu-right">
+      <span class="menu-sys-icon" title="Wifi" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c5.523-5.523 14.477-5.523 20 0l2-2C19.046 3.046 4.954 3.046 1 9zm4 4l2 2c2.761-2.761 7.239-2.761 10 0l2-2C15.381 10.619 8.619 10.619 5 13zm4 4l3 3 3-3c-1.658-1.657-4.342-1.657-6 0z"/></svg>
+      </span>
+      <span class="menu-sys-icon" title="Battery" aria-hidden="true">
+        <svg width="18" height="12" viewBox="0 0 24 14" fill="none"><rect x="0.5" y="0.5" width="20" height="13" rx="3" stroke="currentColor" stroke-opacity="0.7"/><rect x="2" y="2" width="14" height="10" rx="1.5" fill="currentColor" fill-opacity="0.8"/><path d="M21.5 4.5v5c1.5-.5 1.5-4.5 0-5z" fill="currentColor" fill-opacity="0.5"/></svg>
+      </span>
+      <span class="menu-clock" id="menuClock" aria-live="polite">12:00 PM</span>
+    </div>
+  </nav>
+
+  <!-- ========================
+       DESKTOP
+       ======================== -->
+  <main class="desktop" id="desktop">
+
+    <!-- ── WELCOME WINDOW ── -->
+    <div class="window win-welcome" id="welcomeWindow" role="dialog" aria-label="Welcome">
+      <div class="win-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWelcome()" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="win-title-label">Welcome.app</div>
+        <div class="win-chrome-end"></div>
+      </div>
+      <div class="win-body welcome-body">
+        <div class="welcome-glow-ring" aria-hidden="true"></div>
+        <div class="welcome-avatar" aria-label="Om Gawde avatar">
+          <span>OG</span>
+          <div class="avatar-ring" aria-hidden="true"></div>
+        </div>
+        <div class="welcome-text">
+          <h1 class="welcome-name">Hi, I'm <span class="gradient-text">Om Gawde</span> 👋</h1>
+          <p class="welcome-role">Full-Stack Developer · Backend Engineer · Creative Builder</p>
+          <p class="welcome-desc">I build elegant web applications, production-grade backend systems, and developer tools that make an impact.</p>
+        </div>
+        <div class="welcome-chips">
+          <span class="chip chip-blue">Java</span>
+          <span class="chip chip-purple">Spring Boot</span>
+          <span class="chip chip-teal">React</span>
+          <span class="chip chip-green">Node.js</span>
+          <span class="chip chip-orange">REST APIs</span>
+        </div>
+        <div class="welcome-cta">
+          <button class="btn btn-primary" onclick="openWindow('projectsWindow','dockFinder')" id="heroViewProjects">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+            View Projects
+          </button>
+          <button class="btn btn-ghost" onclick="openWindow('contactWindow','dockMail')" id="heroContact">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            Contact Me
+          </button>
+          <button class="btn btn-ghost" onclick="openWindow('resumeWindow','dockPreview')" id="heroResume">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 4v-2h14v2H5z"/></svg>
+            Download CV
+          </button>
+        </div>
+        <p class="welcome-hint" aria-hidden="true">Use the dock below to explore ↓</p>
+      </div>
+    </div>
+
+    <!-- ── PROJECTS WINDOW (Finder) ── -->
+    <div class="window win-projects" id="projectsWindow" role="dialog" aria-label="Projects">
+      <div class="win-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('projectsWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="finder-toolbar">
+          <div class="finder-nav">
+            <button class="finder-nav-btn">‹</button>
+            <button class="finder-nav-btn">›</button>
+          </div>
+          <div class="finder-path-bar">
+            <span>Om Gawde</span>
+            <span class="path-sep">›</span>
+            <span class="path-active">Projects</span>
+          </div>
+          <div class="finder-view-toggle">
+            <button class="view-btn active" id="viewGrid" title="Grid view" onclick="setProjectView('grid')">⊞</button>
+            <button class="view-btn" id="viewList" title="List view" onclick="setProjectView('list')">☰</button>
+          </div>
+        </div>
+      </div>
+      <div class="win-layout-horizontal">
+        <aside class="finder-sidebar">
+          <div class="sidebar-section">
+            <div class="sidebar-heading">FAVORITES</div>
+            <div class="sidebar-item active" data-filter="all">
+              <span class="si-icon">⚡</span> All Projects
+            </div>
+            <div class="sidebar-item" data-filter="web">
+              <span class="si-icon">🌐</span> Web Apps
+            </div>
+            <div class="sidebar-item" data-filter="backend">
+              <span class="si-icon">⚙️</span> Backend
+            </div>
+            <div class="sidebar-item" data-filter="tool">
+              <span class="si-icon">🛠️</span> Tools
+            </div>
+          </div>
+          <div class="sidebar-section">
+            <div class="sidebar-heading">TAGS</div>
+            <div class="sidebar-tag react">React</div>
+            <div class="sidebar-tag java">Java</div>
+            <div class="sidebar-tag node">Node.js</div>
+            <div class="sidebar-tag spring">Spring</div>
+          </div>
+        </aside>
+        <div class="finder-main">
+          <div class="projects-grid" id="projectsGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ABOUT WINDOW (Safari) ── -->
+    <div class="window win-about" id="aboutWindow" role="dialog" aria-label="About Me">
+      <div class="win-chrome safari-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('aboutWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="safari-controls">
+          <button class="safari-nav">‹</button>
+          <button class="safari-nav">›</button>
+          <div class="safari-url">
+            <span class="safari-lock" aria-hidden="true">
+              <svg width="10" height="12" viewBox="0 0 12 16" fill="currentColor"><path d="M10 7H9V4c0-1.657-1.343-3-3-3S3 2.343 3 4v3H2c-.553 0-1 .448-1 1v7c0 .552.447 1 1 1h8c.553 0 1-.448 1-1V8c0-.552-.447-1-1-1zM6 12c-.553 0-1-.448-1-1s.447-1 1-1 1 .448 1 1-.447 1-1 1zM7.5 7h-3V4c0-.828.672-1.5 1.5-1.5.828 0 1.5.672 1.5 1.5v3z"/></svg>
+            </span>
+            <span>omgawde.dev/about</span>
+          </div>
+          <div class="safari-actions">
+            <button class="safari-action-btn" title="Reload">↺</button>
+            <button class="safari-action-btn" title="Share">↑</button>
+          </div>
+        </div>
+      </div>
+      <div class="win-body about-body">
+        <!-- Hero Profile -->
+        <div class="about-hero">
+          <div class="about-profile-pic">
+            <span>OG</span>
+            <div class="profile-status"></div>
+          </div>
+          <div class="about-hero-text">
+            <h2>Om Gawde</h2>
+            <p class="about-title">Full-Stack Developer · Backend Engineer</p>
+            <div class="about-hero-chips">
+              <span class="status-chip green-chip">● Open to Work</span>
+              <span class="status-chip blue-chip">📍 India</span>
+            </div>
+          </div>
+          <div class="about-quick-stats">
+            <div class="stat-item">
+              <div class="stat-value">15+</div>
+              <div class="stat-label">Projects</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">3+</div>
+              <div class="stat-label">Years Coding</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">6+</div>
+              <div class="stat-label">Tech Stack</div>
+            </div>
+          </div>
+        </div>
+        <!-- Content -->
+        <div class="about-grid">
+          <div class="about-card about-bio">
+            <div class="ac-icon">👋</div>
+            <h3>Who I Am</h3>
+            <p>I'm Om — a developer obsessed with building things that are both technically solid and visually polished. I care about the full picture, from database design to user experience.</p>
+          </div>
+          <div class="about-card about-building">
+            <div class="ac-icon">🚀</div>
+            <h3>What I Build</h3>
+            <p>Full-stack web apps with React & Node.js, production REST APIs, Spring Boot microservices, and creative developer tools. I ship fast and iterate.</p>
+          </div>
+          <div class="about-card about-learning">
+            <div class="ac-icon">📚</div>
+            <h3>Currently Learning</h3>
+            <div class="learning-tags">
+              <span class="l-tag">Java Advanced</span>
+              <span class="l-tag">Spring Boot</span>
+              <span class="l-tag">System Design</span>
+              <span class="l-tag">Networking</span>
+            </div>
+          </div>
+          <div class="about-card about-focus">
+            <div class="ac-icon">🎯</div>
+            <h3>Current Focus</h3>
+            <p>Building backend systems at scale — microservices, clean architecture, and deep-diving into distributed systems and cloud infrastructure.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SKILLS WINDOW (Terminal) ── -->
+    <div class="window win-terminal" id="skillsWindow" role="dialog" aria-label="Skills Terminal">
+      <div class="win-chrome terminal-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('skillsWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="win-title-label">om — zsh — 80×24</div>
+        <div class="terminal-chrome-badge">zsh</div>
+      </div>
+      <div class="win-body terminal-body" id="terminalContent">
+        <div class="terminal-lines" id="terminalOutput">
+          <div class="tl-row"><span class="tp">om@portfolio</span><span class="tsep">:</span><span class="tpath">~/skills</span><span class="tsym">$</span><span class="tcmd"> cat stack.yaml</span></div>
+        </div>
+        <div class="terminal-cursor-row">
+          <span class="tp">om@portfolio</span><span class="tsep">:</span><span class="tpath">~/skills</span><span class="tsym">$</span>&nbsp;<span class="tcursor" aria-hidden="true">▋</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EXPERIENCE WINDOW (Notes) ── -->
+    <div class="window win-notes" id="experienceWindow" role="dialog" aria-label="Experience">
+      <div class="win-chrome notes-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('experienceWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="win-title-label">Experience — Notes</div>
+        <div class="notes-toolbar-icons" aria-hidden="true">
+          <span>🖊</span><span>⋯</span>
+        </div>
+      </div>
+      <div class="win-layout-horizontal">
+        <aside class="notes-sidebar">
+          <div class="notes-search">
+            <input type="search" placeholder="Search notes..." aria-label="Search notes" />
+          </div>
+          <div class="notes-list-section">
+            <div class="notes-list-heading">All Notes</div>
+            <div class="notes-list-item active">Experience</div>
+            <div class="notes-list-item">Education</div>
+            <div class="notes-list-item">Achievements</div>
+          </div>
+        </aside>
+        <div class="notes-content" id="notesContent">
+          <div class="notes-meta">
+            <div class="notes-date">Updated March 2026 · 4 items</div>
+            <h2 class="notes-title">Experience & Education</h2>
+          </div>
+          <div class="notes-divider"></div>
+          <div class="exp-timeline" id="expTimeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONTACT WINDOW (Mail) ── -->
+    <div class="window win-mail" id="contactWindow" role="dialog" aria-label="Contact">
+      <div class="win-chrome mail-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('contactWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="mail-toolbar">
+          <div class="win-title-label">Inbox — Mail</div>
+          <button class="mail-compose-btn" onclick="scrollToCompose()">✏️ Compose</button>
+        </div>
+      </div>
+      <div class="win-body mail-body">
+        <div class="mail-hero">
+          <div class="mail-hero-icon">📬</div>
+          <h2>Let's Build Something</h2>
+          <p>Open to opportunities, collabs, and interesting conversations.</p>
+        </div>
+        <div class="mail-links" id="mailLinks"></div>
+        <div class="mail-compose" id="mailCompose">
+          <div class="compose-header">
+            <span>✏️</span>
+            <h3>New Message</h3>
+          </div>
+          <div class="compose-field">
+            <label>From</label>
+            <input type="email" id="contactEmail" placeholder="your@email.com" />
+          </div>
+          <div class="compose-field">
+            <label>Subject</label>
+            <input type="text" id="contactSubject" placeholder="Hey Om, let's connect!" />
+          </div>
+          <div class="compose-field compose-field-grow">
+            <label>Body</label>
+            <textarea id="contactMessage" rows="4" placeholder="I'd love to talk about..."></textarea>
+          </div>
+          <button class="compose-send" onclick="sendMail()" id="sendBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESUME WINDOW (Preview) ── -->
+    <div class="window win-preview" id="resumeWindow" role="dialog" aria-label="Resume">
+      <div class="win-chrome preview-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('resumeWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="preview-toolbar">
+          <div class="preview-navs">
+            <button class="preview-nav">‹</button>
+            <button class="preview-nav">›</button>
+          </div>
+          <span class="preview-label">Resume.pdf</span>
+          <div class="preview-actions">
+            <button class="preview-action" title="Zoom in">+</button>
+            <span class="preview-zoom">100%</span>
+            <button class="preview-action" title="Zoom out">−</button>
+          </div>
+        </div>
+      </div>
+      <div class="win-body preview-body">
+        <div class="resume-paper">
+          <div class="resume-header">
+            <div class="resume-header-left">
+              <h1>Om Gawde</h1>
+              <p class="resume-role">Full-Stack Developer · Backend Engineer</p>
+            </div>
+            <div class="resume-header-right">
+              <div class="resume-contact-item">om@example.com</div>
+              <div class="resume-contact-item">github.com/omgawde</div>
+              <div class="resume-contact-item">linkedin.com/in/omgawde</div>
+            </div>
+          </div>
+          <div class="resume-body-grid">
+            <div class="resume-main">
+              <section class="rs">
+                <h3>Summary</h3>
+                <p>Full-stack developer with a focus on building clean, scalable applications. Experienced in Java, Spring Boot, React, and modern JavaScript ecosystems. Passionate about backend architecture and developer tooling.</p>
+              </section>
+              <section class="rs">
+                <h3>Experience</h3>
+                <div class="rexp"><div class="rexp-title">Full-Stack Developer Intern</div><div class="rexp-meta">Tech Company · 2025–Present</div><p>Built end-to-end features using React + Node.js. Optimized API performance by 40% via Redis caching and query tuning.</p></div>
+                <div class="rexp"><div class="rexp-title">Open Source Contributor</div><div class="rexp-meta">GitHub · 2024–Present</div><p>Active contributor with consistent commits across REST API utilities, dev tools, and React component libraries.</p></div>
+              </section>
+              <section class="rs">
+                <h3>Education</h3>
+                <div class="rexp"><div class="rexp-title">Bachelor of Computer Science</div><div class="rexp-meta">University · 2023–2027</div><p>Focus on software engineering, data structures, algorithms, and networking fundamentals.</p></div>
+              </section>
+            </div>
+            <div class="resume-sidebar">
+              <section class="rs">
+                <h3>Skills</h3>
+                <p><strong>Languages</strong><br/>Java, JS/TS, Python, SQL</p>
+                <p><strong>Frameworks</strong><br/>Spring Boot, React, Node.js</p>
+                <p><strong>Tools</strong><br/>Git, Docker, PostgreSQL, Redis</p>
+              </section>
+              <section class="rs">
+                <h3>Interests</h3>
+                <p>System Design, Microservices, Open Source, Networking</p>
+              </section>
+            </div>
+          </div>
+        </div>
+        <div class="preview-download-bar">
+          <button class="download-btn" onclick="downloadResume()" id="downloadBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 4v-2h14v2H5z"/></svg>
+            Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── IDEAS WINDOW ── -->
+    <div class="window win-ideas" id="ideasWindow" role="dialog" aria-label="Ideas">
+      <div class="win-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('ideasWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="win-title-label">💡 Ideas.md</div>
+        <div class="win-chrome-end"></div>
+      </div>
+      <div class="win-body ideas-body">
+        <div class="ideas-header">
+          <div class="ideas-header-icon">💡</div>
+          <div>
+            <h2 class="ideas-title">Startup Ideas & Side Projects</h2>
+            <p class="ideas-subtitle">Things I want to build someday</p>
+          </div>
+        </div>
+        <div class="ideas-grid">
+          <div class="idea-card idea-blue">
+            <div class="idea-tag">SaaS</div>
+            <h3>Dev Tools Dashboard</h3>
+            <p>Unified dashboard for developers — GitHub stats, CI/CD status, deployment logs, and alerts in one place.</p>
+            <div class="idea-meta">🔥 High interest · Backend-heavy</div>
+          </div>
+          <div class="idea-card idea-purple">
+            <div class="idea-tag">Open Source</div>
+            <h3>Spring Boot Starter Kit</h3>
+            <p>Opinionated starter for Spring Boot APIs with auth, rate limiting, logging, and Docker compose pre-configured.</p>
+            <div class="idea-meta">⚡ Could ship in a weekend</div>
+          </div>
+          <div class="idea-card idea-green">
+            <div class="idea-tag">Productivity</div>
+            <h3>Code Snippet Manager</h3>
+            <p>A native-feeling snippet vault with tagging, search, and editor plugin support. Better than GitHub Gist.</p>
+            <div class="idea-meta">🌱 Early research phase</div>
+          </div>
+          <div class="idea-card idea-orange">
+            <div class="idea-tag">AI</div>
+            <h3>PR Review Copilot</h3>
+            <p>CLI + GitHub Action that reviews PRs for security, performance, and style issues using LLMs.</p>
+            <div class="idea-meta">🤖 Technically challenging</div>
+          </div>
+          <div class="idea-card idea-teal">
+            <div class="idea-tag">Dev Tool</div>
+            <h3>API Diffing Tool</h3>
+            <p>Compare two API versions and auto-generate a changelog with breaking changes highlighted clearly.</p>
+            <div class="idea-meta">🔧 Solving my own pain</div>
+          </div>
+          <div class="idea-card idea-pink">
+            <div class="idea-tag">Community</div>
+            <h3>Dev Portfolio OS</h3>
+            <p>A template system for macOS-style portfolio websites — ship your portfolio in an hour, not a week.</p>
+            <div class="idea-meta">🌐 This very portfolio!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOW WINDOW ── -->
+    <div class="window win-now" id="nowWindow" role="dialog" aria-label="Now">
+      <div class="win-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('nowWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="win-title-label">📍 Now — March 2026</div>
+        <div class="win-chrome-end"></div>
+      </div>
+      <div class="win-body now-body">
+        <div class="now-intro">
+          <div class="now-pulse-dot" aria-hidden="true"></div>
+          <div>
+            <h2 class="now-heading">What I'm doing <span class="gradient-text">right now</span></h2>
+            <p class="now-subtext">Last updated: March 2026 · Inspired by <a href="https://nownownow.com" target="_blank" rel="noopener" class="now-link">nownownow.com</a></p>
+          </div>
+        </div>
+        <div class="now-sections">
+          <div class="now-section">
+            <div class="now-section-icon">⚡</div>
+            <div class="now-section-content">
+              <h3>Building</h3>
+              <p>Working on a production Spring Boot microservices project — building an auth service with JWT + Redis session management, rate limiting, and Docker deployment.</p>
+            </div>
+          </div>
+          <div class="now-section">
+            <div class="now-section-icon">📚</div>
+            <div class="now-section-content">
+              <h3>Learning</h3>
+              <p>Deep dive into <strong>System Design</strong> — studying distributed systems, consistent hashing, CAP theorem. Also picking up advanced Java concurrency patterns.</p>
+            </div>
+          </div>
+          <div class="now-section">
+            <div class="now-section-icon">🎯</div>
+            <div class="now-section-content">
+              <h3>Focus</h3>
+              <p>Landing an impactful internship or role where I can ship real backend infrastructure. Targeting companies building developer tools or fintech systems.</p>
+            </div>
+          </div>
+          <div class="now-section">
+            <div class="now-section-icon">🌱</div>
+            <div class="now-section-content">
+              <h3>Reading</h3>
+              <p><em>Designing Data-Intensive Applications</em> by Martin Kleppmann. Also following the Java 21 virtual threads and structured concurrency specs closely.</p>
+            </div>
+          </div>
+          <div class="now-section">
+            <div class="now-section-icon">🎵</div>
+            <div class="now-section-content">
+              <h3>Listening</h3>
+              <p>Lo-fi hip-hop while coding. Podcasts: <em>Software Engineering Daily</em> and <em>Lex Fridman</em> for the big-picture thinking hits.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DESKTOP FOLDERS ── -->
+    <div class="desktop-folders" id="desktopFolders" aria-label="Desktop folders">
+      <div class="folder-item" id="folderProjects"
+           data-window="projectsWindow" data-dock="dockFinder"
+           tabindex="0" role="button" aria-label="Projects folder">
+        <div class="folder-icon-wrap">
+          <img class="folder-icon" src="assets/folder-blue.png" alt="" draggable="false" />
+        </div>
+        <span class="folder-label">Projects</span>
+      </div>
+      <div class="folder-item" id="folderAbout"
+           data-window="aboutWindow" data-dock="dockSafari"
+           tabindex="0" role="button" aria-label="About Me folder">
+        <div class="folder-icon-wrap">
+          <img class="folder-icon" src="assets/folder-purple.png" alt="" draggable="false" />
+        </div>
+        <span class="folder-label">About Me</span>
+      </div>
+      <div class="folder-item" id="folderResume"
+           data-window="resumeWindow" data-dock="dockPreview"
+           tabindex="0" role="button" aria-label="Resume folder">
+        <div class="folder-icon-wrap">
+          <img class="folder-icon" src="assets/folder-green.png" alt="" draggable="false" />
+        </div>
+        <span class="folder-label">Resume</span>
+      </div>
+      <div class="folder-item" id="folderContact"
+           data-window="contactWindow" data-dock="dockMail"
+           tabindex="0" role="button" aria-label="Contact folder">
+        <div class="folder-icon-wrap">
+          <img class="folder-icon" src="assets/folder-red.png" alt="" draggable="false" />
+        </div>
+        <span class="folder-label">Contact</span>
+      </div>
+      <div class="folder-item" id="folderIdeas"
+           data-window="ideasWindow" data-dock=""
+           tabindex="0" role="button" aria-label="Ideas folder">
+        <div class="folder-icon-wrap">
+          <img class="folder-icon" src="assets/folder-yellow.png" alt="" draggable="false" />
+        </div>
+        <span class="folder-label">Ideas</span>
+      </div>
+      <div class="folder-item" id="folderNow"
+           data-window="nowWindow" data-dock=""
+           tabindex="0" role="button" aria-label="Now folder">
+        <div class="folder-icon-wrap">
+          <img class="folder-icon" src="assets/folder-blue.png" alt="" style="filter:hue-rotate(180deg) saturate(1.2)" draggable="false" />
+        </div>
+        <span class="folder-label">Now</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================
+       DOCK
+       ======================== -->
+  <footer class="dock-shell" role="navigation" aria-label="Application Dock">
+    <div class="dock-reflection" aria-hidden="true"></div>
+    <div class="dock" id="dock">
+
+      <div class="dock-item" id="dockFinder" onclick="openWindow('projectsWindow','dockFinder')" title="Projects" tabindex="0" role="button" aria-label="Open Projects">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/finder.png" alt="Finder" draggable="false" />
+        </div>
+        <span class="dock-tooltip">Projects</span>
+        <div class="dock-pip"></div>
+      </div>
+
+      <div class="dock-item" id="dockSafari" onclick="openWindow('aboutWindow','dockSafari')" title="About Me" tabindex="0" role="button" aria-label="Open About">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/safari.png" alt="Safari" draggable="false" />
+        </div>
+        <span class="dock-tooltip">About</span>
+        <div class="dock-pip"></div>
+      </div>
+
+      <div class="dock-item" id="dockTerminal" onclick="openWindow('skillsWindow','dockTerminal')" title="Skills" tabindex="0" role="button" aria-label="Open Skills">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/terminal.png" alt="Terminal" draggable="false" />
+        </div>
+        <span class="dock-tooltip">Skills</span>
+        <div class="dock-pip"></div>
+      </div>
+
+      <div class="dock-item" id="dockNotes" onclick="openWindow('experienceWindow','dockNotes')" title="Experience" tabindex="0" role="button" aria-label="Open Experience">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/notes.png" alt="Notes" draggable="false" />
+        </div>
+        <span class="dock-tooltip">Experience</span>
+        <div class="dock-pip"></div>
+      </div>
+
+      <div class="dock-sep" aria-hidden="true"></div>
+
+      <div class="dock-item" id="dockMail" onclick="openWindow('contactWindow','dockMail')" title="Contact" tabindex="0" role="button" aria-label="Open Contact">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/mail.png" alt="Mail" draggable="false" />
+        </div>
+        <span class="dock-tooltip">Mail</span>
+        <div class="dock-pip"></div>
+      </div>
+
+      <div class="dock-item" id="dockPreview" onclick="openWindow('resumeWindow','dockPreview')" title="Resume" tabindex="0" role="button" aria-label="Open Resume">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/preview.png" alt="Preview" draggable="false" />
+        </div>
+        <span class="dock-tooltip">Resume</span>
+        <div class="dock-pip"></div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
