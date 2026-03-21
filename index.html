@@ -12,6 +12,18 @@
 </head>
 <body>
 
+  <!-- MAC OS BOOT SCREEN -->
+  <div id="bootScreen">
+    <div class="boot-logo">
+      <svg viewBox="0 0 512 512" width="70" height="70" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#ffffff" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.1-44.6-35.9-2.8-74.3 22.7-93.1 22.7-18.8 0-46.8-20.7-77.6-19.6-36.8 1.1-70.5 21.5-89.8 54.5-39 67.2-10 168.1 28 221 18.7 26 41.5 56.4 70.3 55.3 27.5-1.1 38.6-18 70.7-18 32.2 0 42.1 18 71.1 17.5 29.5-.6 50.1-28.7 68.6-54.8 21.3-29.5 30-58.4 30.5-59.8-1.5-.7-44.3-17.5-44.6-89.4zm-48.4-159.2c16.3-19.6 27.2-46.7 24.2-73.8-23.2 1-52.6 15.6-69.3 35.2-13.4 15.6-26.2 43.1-22.8 69.4 25.8 2 51.5-11.2 67.9-30.8z"/>
+      </svg>
+    </div>
+    <div class="boot-progress-container">
+      <div class="boot-progress-bar" id="bootProgressBar"></div>
+    </div>
+  </div>
+
   <!-- CANVAS LAYER: stars + noise -->
   <canvas id="bgCanvas" aria-hidden="true"></canvas>
 
@@ -591,34 +603,45 @@
           <button class="tl yellow" aria-label="Minimize"></button>
           <button class="tl green" aria-label="Maximize"></button>
         </div>
-        <div class="win-title-label">🕹️ Dev Arcade — Catch the Bug</div>
+        <div class="win-title-label">🕹️ Dev Arcade — Tech Stack Quest</div>
         <div class="win-chrome-end"></div>
       </div>
-      <div class="win-body arcade-body">
-        <div class="arcade-hud">
+      <div class="win-body arcade-body" style="padding: 0; display: flex; flex-direction: column; overflow: hidden; background: #1a1a1a;">
+        <div class="arcade-hud" style="flex: 0 0 auto; padding: 10px 15px; border-bottom: 1px solid #333;">
           <div class="arcade-score-wrap">
-            <span class="arcade-score-label">🐛 Bugs Fixed</span>
-            <span class="arcade-score" id="bugScore">0</span>
+            <span class="arcade-score-label" style="margin-right: 8px;">Stack Collected:</span>
+            <span class="arcade-score" id="platScore">0</span>
+            <span class="arcade-score-label" style="margin-left: 2px;">/ 4</span>
           </div>
           <div class="arcade-hud-right">
-            <span class="arcade-timer" id="bugTimer">60s</span>
-            <button class="arcade-reset-btn" id="bugReset">↺ Reset</button>
+            <button class="arcade-reset-btn" id="platReset">↺ Restart</button>
           </div>
         </div>
-        <div class="arcade-game-area" id="bugGameArea">
-          <div class="game-over-overlay" id="bugGameOver">
+        <div class="arcade-game-area" id="kaboomContainer" style="flex: 1 1 auto; position: relative; overflow: hidden; width: 100%; height: 100%; border-radius: 0 0 10px 10px;">
+          <!-- START SCREEN -->
+          <div class="game-over-overlay visible" id="platStartScreen" style="background: rgba(0,0,0,0.85); z-index: 10;">
             <div class="game-over-content">
-              <div class="game-over-emoji">🏆</div>
-              <h2 class="game-over-title">You fixed <span id="bugScoreMsg">0</span> bugs!</h2>
-              <p class="game-over-sub">Now check my real projects 👇</p>
+              <div class="game-over-emoji">👾</div>
+              <h2 class="game-over-title">Tech Stack Quest</h2>
+              <p class="game-over-sub" style="margin-bottom: 20px;">Support keyboard: Arrows or W/A/S/D to move & jump.<br>Collect Java, Spring Boot, API, and Database.</p>
               <div class="game-over-actions">
-                <button class="btn btn-primary" id="bugViewProjects">📁 View Projects</button>
-                <button class="btn btn-ghost" id="bugPlayAgain">↺ Play Again</button>
+                <button class="btn btn-primary" id="platStartBtn">Play Now</button>
+              </div>
+            </div>
+          </div>
+          <!-- GAME OVER / SUCCESS SCREEN -->
+          <div class="game-over-overlay" id="platGameOver" style="background: rgba(0,0,0,0.85); z-index: 10;">
+            <div class="game-over-content">
+              <div class="game-over-emoji" id="platEndEmoji">🏆</div>
+              <h2 class="game-over-title" id="platEndTitle">Level Complete!</h2>
+              <p class="game-over-sub">You collected <span id="platScoreMsg">0</span> out of 4 tech items.</p>
+              <div class="game-over-actions">
+                <button class="btn btn-primary" id="platViewProjects">📁 View Projects</button>
+                <button class="btn btn-ghost" id="platPlayAgain">↺ Play Again</button>
               </div>
             </div>
           </div>
         </div>
-        <p class="arcade-hint">Click the bugs before they escape! 🐛🦟🪲</p>
       </div>
     </div>
 
@@ -714,6 +737,7 @@
   <!-- TOAST -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="https://unpkg.com/kaboom@3000.1.17/dist/kaboom.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
