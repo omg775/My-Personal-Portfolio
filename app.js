@@ -38,6 +38,8 @@ const SKILLS = [
 let activeWindowId = null;
 let activeDockId   = null;
 let terminalDone   = false;
+let _winZ          = 120; // z-index counter for window stacking
+
 
 /* ═══════════════════════════
    CANVAS: STARS
@@ -97,45 +99,59 @@ setInterval(tick, 1000);
 /* ═══════════════════════════
    WINDOW MANAGEMENT
 ═══════════════════════════ */
-function openWindow(winId, dockId) {
-  // close previous
-  if (activeWindowId && activeWindowId !== winId) {
-    document.getElementById(activeWindowId)?.classList.remove('active');
-    document.getElementById(activeDockId)?.classList.remove('running');
-  }
+/* dock → window id map (for closeWindow pip sync) */
+const DOCK_MAP = {
+  projectsWindow:   'dockFinder',
+  aboutWindow:      'dockSafari',
+  skillsWindow:     'dockTerminal',
+  experienceWindow: 'dockNotes',
+  contactWindow:    'dockMail',
+  resumeWindow:     'dockPreview',
+  arcadeWindow:     'dockArcade',
+};
 
-  // toggle if same
-  if (activeWindowId === winId) {
-    document.getElementById(winId)?.classList.remove('active');
-    document.getElementById(dockId)?.classList.remove('running');
-    activeWindowId = activeDockId = null;
+function bringToFront(winEl) {
+  _winZ++;
+  winEl.style.zIndex = _winZ;
+}
+
+function openWindow(winId, dockId) {
+  const winEl  = document.getElementById(winId);
+  const dockEl = document.getElementById(dockId);
+  if (!winEl) return;
+
+  // Toggle off if already visible
+  if (winEl.classList.contains('active')) {
+    winEl.classList.remove('active');
+    dockEl?.classList.remove('running');
     return;
   }
 
-  // hide welcome
+  // Hide welcome
   document.getElementById('welcomeWindow')?.classList.remove('active');
 
-  // show new
-  document.getElementById(winId)?.classList.add('active');
-  document.getElementById(dockId)?.classList.add('running');
+  // Open (leave other windows open — multi-window)
+  winEl.classList.add('active');
+  dockEl?.classList.add('running');
   activeWindowId = winId;
   activeDockId   = dockId;
+  bringToFront(winEl);
 
-  // section inits
-  if (winId === 'projectsWindow')  renderProjects();
+  // Section inits
+  if (winId === 'projectsWindow')   renderProjects();
   if (winId === 'experienceWindow') renderExperience();
-  if (winId === 'contactWindow')   renderContacts();
+  if (winId === 'contactWindow')    renderContacts();
   if (winId === 'skillsWindow' && !terminalDone) setTimeout(animateTerminal, 180);
   if (winId === 'arcadeWindow') setTimeout(initBugGame, 80);
 }
 
 function closeWindow(winId) {
   document.getElementById(winId)?.classList.remove('active');
-  if (activeWindowId === winId) {
-    document.getElementById(activeDockId)?.classList.remove('running');
-    activeWindowId = activeDockId = null;
-  }
+  const dId = DOCK_MAP[winId] || activeDockId;
+  document.getElementById(dId)?.classList.remove('running');
+  if (activeWindowId === winId) activeWindowId = activeDockId = null;
 }
+
 
 function closeWelcome() {
   document.getElementById('welcomeWindow')?.classList.remove('active');
@@ -399,62 +415,164 @@ function initParallax() {
 }
 
 /* ═══════════════════════════
-   DESKTOP FOLDERS
+   DESKTOP FOLDERS (with drag)
 ═══════════════════════════ */
 function initFolders() {
-  const folders = document.querySelectorAll('.folder-item');
-  let selectedFolder = null;
-  const clickTimers = {};
+  const desktop   = document.getElementById('desktop');
+  const folders   = document.querySelectorAll('.folder-item');
+  let   folderDrag = null;
+  let   lastClicked = null;
+
+  // ── Position folders (match old flex column layout) ──
+  const GAP = 6, ITEM_H = 90;
+  folders.forEach((f, i) => {
+    f.style.left = '16px';
+    f.style.top  = (12 + i * (ITEM_H + GAP)) + 'px';
+  });
 
   folders.forEach(folder => {
-    // single click = highlight
-    folder.addEventListener('click', e => {
-      const id = folder.id;
-
-      // deselect all others
-      folders.forEach(f => f.classList.remove('selected'));
-
-      if (selectedFolder === id) {
-        // second click — will be caught by dblclick; just keep selected
-        folder.classList.add('selected');
-      } else {
-        selectedFolder = id;
-        folder.classList.add('selected');
-      }
-
-      // deselect when clicking elsewhere
+    // ── Mousedown: start potential drag ──
+    folder.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
       e.stopPropagation();
+      const desk  = desktop.getBoundingClientRect();
+      const fRect = folder.getBoundingClientRect();
+      folderDrag = {
+        el: folder,
+        mx: e.clientX, my: e.clientY,
+        ox: fRect.left - desk.left,
+        oy: fRect.top  - desk.top,
+        moved: false,
+      };
     });
 
-    // double click = open window with bounce
+    // ── Click: select ──
+    folder.addEventListener('click', e => {
+      if (folder._dragged) { folder._dragged = false; return; }
+      e.stopPropagation();
+      folders.forEach(f => f.classList.remove('selected'));
+      folder.classList.add('selected');
+    });
+
+    // ── Dblclick: open window ──
     folder.addEventListener('dblclick', e => {
+      if (folder._dragged) return;
       e.stopPropagation();
       const winId  = folder.dataset.window;
       const dockId = folder.dataset.dock || null;
-
-      // bounce animation
       folder.classList.add('opening');
       folder.addEventListener('animationend', () => folder.classList.remove('opening'), { once: true });
-
       openWindow(winId, dockId);
       showToast(`📂 Opening ${folder.querySelector('.folder-label').textContent}…`, 1800);
     });
 
-    // keyboard: Enter = open, Space = select
+    // ── Keyboard ──
     folder.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        folder.dispatchEvent(new MouseEvent('dblclick'));
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        folder.dispatchEvent(new MouseEvent('click'));
-      }
+      if (e.key === 'Enter') folder.dispatchEvent(new MouseEvent('dblclick'));
+      else if (e.key === ' ') { e.preventDefault(); folder.dispatchEvent(new MouseEvent('click')); }
     });
   });
 
-  // clicking desktop background deselects folders
-  document.getElementById('desktop')?.addEventListener('click', () => {
-    document.querySelectorAll('.folder-item').forEach(f => f.classList.remove('selected'));
-    selectedFolder = null;
+  // ── Global folder mousemove ──
+  document.addEventListener('mousemove', e => {
+    if (!folderDrag) return;
+    const dx = e.clientX - folderDrag.mx;
+    const dy = e.clientY - folderDrag.my;
+    if (!folderDrag.moved && Math.hypot(dx, dy) < 5) return;
+    if (!folderDrag.moved) {
+      folderDrag.moved = true;
+      folderDrag.el.classList.add('folder-dragging');
+    }
+    const desk = desktop.getBoundingClientRect();
+    const fw   = folderDrag.el.offsetWidth;
+    const fh   = folderDrag.el.offsetHeight;
+    const nl   = Math.max(0, Math.min(desk.width  - fw,      folderDrag.ox + dx));
+    const nt   = Math.max(0, Math.min(desk.height - fh - 10, folderDrag.ox !== folderDrag.ox ? 0 : folderDrag.oy + dy));
+    folderDrag.el.style.left = nl + 'px';
+    folderDrag.el.style.top  = (Math.max(0, Math.min(desk.height - fh - 10, folderDrag.oy + dy))) + 'px';
+  });
+
+  // ── Global folder mouseup ──
+  document.addEventListener('mouseup', () => {
+    if (!folderDrag) return;
+    folderDrag.el.classList.remove('folder-dragging');
+    if (folderDrag.moved) {
+      folderDrag.el._dragged = true;
+      setTimeout(() => { folderDrag.el._dragged = false; }, 250);
+    }
+    folderDrag = null;
+  });
+
+  // ── Desktop click deselects ──
+  desktop?.addEventListener('click', () => {
+    folders.forEach(f => f.classList.remove('selected'));
+  });
+}
+
+/* ═══════════════════════════
+   DRAGGABLE WINDOWS
+═══════════════════════════ */
+function initDraggableWindows() {
+  const desktop = document.getElementById('desktop');
+  let   winDrag  = null;
+
+  document.querySelectorAll('.window').forEach(win => {
+    // Clicking any part of win brings it to front
+    win.addEventListener('mousedown', () => bringToFront(win), true);
+
+    const chrome = win.querySelector('.win-chrome');
+    if (!chrome) return;
+
+    chrome.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      if (e.target.closest('.traffic-lights')) return; // don't drag from buttons
+      e.preventDefault();
+
+      bringToFront(win);
+
+      // If window hasn't been manually positioned yet, compute real px coords
+      if (!win.classList.contains('win-positioned')) {
+        const dr = desktop.getBoundingClientRect();
+        const wr = win.getBoundingClientRect();
+        win.style.left      = (wr.left - dr.left) + 'px';
+        win.style.top       = (wr.top  - dr.top)  + 'px';
+        win.style.translate = 'none';
+        win.style.transform = 'none';
+        win.style.animation = 'none';
+        win.classList.add('win-positioned');
+      }
+
+      const dr = desktop.getBoundingClientRect();
+      const wr = win.getBoundingClientRect();
+      winDrag = {
+        win,
+        mx: e.clientX, my: e.clientY,
+        ox: wr.left - dr.left,
+        oy: wr.top  - dr.top,
+      };
+    });
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!winDrag) return;
+    const { win, mx, my, ox, oy } = winDrag;
+    const dr = desktop.getBoundingClientRect();
+    const dx = e.clientX - mx;
+    const dy = e.clientY - my;
+    const CHROME_H = 44;
+    const ww = win.offsetWidth;
+    // clamp: always keep title bar reachable
+    const nl = Math.max(-(ww - 120), Math.min(dr.width  - 120, ox + dx));
+    const nt = Math.max(0,           Math.min(dr.height - CHROME_H, oy + dy));
+    win.classList.add('win-dragging');
+    win.style.left = nl + 'px';
+    win.style.top  = nt + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!winDrag) return;
+    winDrag.win.classList.remove('win-dragging');
+    winDrag = null;
   });
 }
 
@@ -465,14 +583,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initDockMagnification();
   initParallax();
   initFolders();
+  initDraggableWindows();
   initClockWidget();
   initQuoteWidget();
 
-  // Show welcome
   setTimeout(() => {
     document.getElementById('welcomeWindow')?.classList.add('active');
   }, 150);
 });
+
 
 /* ═══════════════════════════
    WIDGET — ANALOG CLOCK

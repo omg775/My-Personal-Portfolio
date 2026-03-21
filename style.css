@@ -102,6 +102,25 @@ body::after {
 .window.active { opacity:1; transform:scale(1) translateY(0); pointer-events:all; }
 @keyframes float { 0%,100%{translate:-50% calc(-50% + 0px)} 50%{translate:-50% calc(-50% - 6px)} }
 
+/* Window manually positioned (drag converts centering to px coords) */
+.window.win-positioned {
+  animation:none !important;
+  translate:none !important;
+  transform:none !important;
+  transition:opacity .2s ease, box-shadow .2s ease !important;
+}
+/* While dragging */
+.window.win-dragging {
+  transition:none !important;
+  animation:none !important;
+  cursor:grabbing !important;
+  box-shadow:0 60px 120px rgba(0,0,0,.85), 0 0 0 .5px rgba(255,255,255,.12) !important;
+  transform:scale(1.015) !important;
+}
+/* Draggable titlebar */
+.win-chrome { cursor:grab; }
+.win-chrome:active { cursor:grabbing; }
+
 /* sizes */
 .win-welcome  { width:min(540px,92vw); }
 .win-projects { width:min(860px,96vw); height:min(580px,82vh); }
@@ -481,17 +500,14 @@ body::after {
 ════════════════════════════════ */
 .desktop-folders {
   position:absolute;
-  top:12px;
-  left:16px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
+  inset:0;
+  pointer-events:none; /* folders handle their own events */
   z-index:10;
-  pointer-events:all;
 }
 
 /* Each folder item */
 .folder-item {
+  position:absolute;   /* JS sets left/top */
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -500,12 +516,13 @@ body::after {
   cursor:default;
   border-radius:8px;
   padding:7px 5px 6px;
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1), background .15s;
-  position:relative;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .15s, box-shadow .15s;
   outline:none;
+  pointer-events:all;
+  touch-action:none;
+  user-select:none;
 }
 .folder-item:hover {
-  transform:translateY(-3px) scale(1.07);
   background:rgba(255,255,255,.07);
 }
 .folder-item:hover .folder-icon {
@@ -519,6 +536,13 @@ body::after {
   background:rgba(59,130,246,.8);
   color:#fff;
   border-radius:3px;
+}
+.folder-item.folder-dragging {
+  transform:scale(1.1) !important;
+  cursor:grabbing !important;
+  z-index:9999 !important;
+  filter:drop-shadow(0 14px 28px rgba(0,0,0,.65));
+  transition:none !important;
 }
 /* open animation */
 .folder-item.opening {
