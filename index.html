@@ -583,6 +583,45 @@
       </div>
     </div>
 
+    <!-- ── ARCADE WINDOW ── -->
+    <div class="window win-arcade" id="arcadeWindow" role="dialog" aria-label="Dev Arcade">
+      <div class="win-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('arcadeWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="win-title-label">🕹️ Dev Arcade — Catch the Bug</div>
+        <div class="win-chrome-end"></div>
+      </div>
+      <div class="win-body arcade-body">
+        <div class="arcade-hud">
+          <div class="arcade-score-wrap">
+            <span class="arcade-score-label">🐛 Bugs Fixed</span>
+            <span class="arcade-score" id="bugScore">0</span>
+          </div>
+          <div class="arcade-hud-right">
+            <span class="arcade-timer" id="bugTimer">60s</span>
+            <button class="arcade-reset-btn" id="bugReset">↺ Reset</button>
+          </div>
+        </div>
+        <div class="arcade-game-area" id="bugGameArea">
+          <div class="game-over-overlay" id="bugGameOver">
+            <div class="game-over-content">
+              <div class="game-over-emoji">🏆</div>
+              <h2 class="game-over-title">You fixed <span id="bugScoreMsg">0</span> bugs!</h2>
+              <p class="game-over-sub">Now check my real projects 👇</p>
+              <div class="game-over-actions">
+                <button class="btn btn-primary" id="bugViewProjects">📁 View Projects</button>
+                <button class="btn btn-ghost" id="bugPlayAgain">↺ Play Again</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="arcade-hint">Click the bugs before they escape! 🐛🦟🪲</p>
+      </div>
+    </div>
+
   </main>
 
   <!-- ========================
@@ -642,8 +681,35 @@
         <div class="dock-pip"></div>
       </div>
 
+      <div class="dock-sep" aria-hidden="true"></div>
+
+      <div class="dock-item" id="dockArcade" onclick="openWindow('arcadeWindow','dockArcade')" title="Dev Arcade" tabindex="0" role="button" aria-label="Open Dev Arcade">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/arcade.png" alt="Arcade" draggable="false" />
+        </div>
+        <span class="dock-tooltip">Dev Arcade</span>
+        <div class="dock-pip"></div>
+      </div>
+
     </div>
   </footer>
+
+  <!-- DESKTOP WIDGETS -->
+  <div class="desktop-widgets" id="desktopWidgets" aria-label="Desktop widgets">
+    <!-- Clock -->
+    <div class="widget widget-clock" role="timer" aria-label="Current time">
+      <canvas class="clock-canvas" id="clockCanvas" width="160" height="160"></canvas>
+      <div class="widget-date" id="widgetDate">Loading...</div>
+    </div>
+    <!-- Dev Quote -->
+    <div class="widget widget-quote" id="quoteWidget"
+         tabindex="0" role="button" aria-label="Developer quote — click for new">
+      <div class="quote-mark" aria-hidden="true">❝</div>
+      <p class="quote-text" id="quoteText">Loading quote...</p>
+      <div class="quote-author" id="quoteAuthor"></div>
+      <div class="quote-hint">click for new quote →</div>
+    </div>
+  </div>
 
   <!-- TOAST -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

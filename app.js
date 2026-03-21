@@ -126,6 +126,7 @@ function openWindow(winId, dockId) {
   if (winId === 'experienceWindow') renderExperience();
   if (winId === 'contactWindow')   renderContacts();
   if (winId === 'skillsWindow' && !terminalDone) setTimeout(animateTerminal, 180);
+  if (winId === 'arcadeWindow') setTimeout(initBugGame, 80);
 }
 
 function closeWindow(winId) {
@@ -464,10 +465,364 @@ document.addEventListener('DOMContentLoaded', () => {
   initDockMagnification();
   initParallax();
   initFolders();
+  initClockWidget();
+  initQuoteWidget();
 
   // Show welcome
   setTimeout(() => {
     document.getElementById('welcomeWindow')?.classList.add('active');
   }, 150);
 });
+
+/* ═══════════════════════════
+   WIDGET — ANALOG CLOCK
+═══════════════════════════ */
+function initClockWidget() {
+  const canvas = document.getElementById('clockCanvas');
+  const dateEl = document.getElementById('widgetDate');
+  if (!canvas) return;
+
+  // Hi-DPI support
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const SIZE = 160;
+  canvas.width  = SIZE * dpr;
+  canvas.height = SIZE * dpr;
+  canvas.style.width  = SIZE + 'px';
+  canvas.style.height = SIZE + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const CX = SIZE / 2, CY = SIZE / 2;
+  const R  = SIZE / 2 - 4;
+
+  const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Draw a rounded rect via path (broad compat)
+  function roundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y,     x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y,     x + r, y);
+    ctx.closePath();
+  }
+
+  function hand(angle, length, back, width, color, shadow) {
+    ctx.save();
+    if (shadow) { ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 4; }
+    ctx.beginPath();
+    ctx.moveTo(CX - Math.cos(angle) * back,   CY - Math.sin(angle) * back);
+    ctx.lineTo(CX + Math.cos(angle) * length, CY + Math.sin(angle) * length);
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = width;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw() {
+    const now = new Date();
+    const H   = now.getHours() % 12;
+    const M   = now.getMinutes();
+    const S   = now.getSeconds();
+    const MS  = now.getMilliseconds();
+
+    // Date label
+    if (dateEl) {
+      dateEl.textContent = `${DAYS[now.getDay()]}, ${MONTHS[now.getMonth()]} ${now.getDate()}`;
+    }
+
+    ctx.clearRect(0, 0, SIZE, SIZE);
+
+    // ── Face background ──
+    ctx.save();
+    roundedRect(2, 2, SIZE - 4, SIZE - 4, 28);
+    // Outer bevel shadow
+    ctx.shadowColor = 'rgba(0,0,0,.22)';
+    ctx.shadowBlur  = 10;
+    ctx.shadowOffsetY = 2;
+    const bg = ctx.createRadialGradient(CX, CY - 12, 0, CX, CY, R + 6);
+    bg.addColorStop(0, '#ffffff');
+    bg.addColorStop(1, '#e8e8ec');
+    ctx.fillStyle = bg;
+    ctx.fill();
+    ctx.restore();
+
+    // Clip everything inside the face
+    ctx.save();
+    roundedRect(2, 2, SIZE - 4, SIZE - 4, 28);
+    ctx.clip();
+
+    // ── Tick marks ──
+    for (let i = 0; i < 60; i++) {
+      const a       = (i / 60) * Math.PI * 2 - Math.PI / 2;
+      const major   = i % 5 === 0;
+      const outerR  = R - 2;
+      const innerR  = major ? outerR - 9 : outerR - 5;
+      ctx.beginPath();
+      ctx.moveTo(CX + Math.cos(a) * innerR, CY + Math.sin(a) * innerR);
+      ctx.lineTo(CX + Math.cos(a) * outerR, CY + Math.sin(a) * outerR);
+      ctx.strokeStyle = major ? 'rgba(50,50,58,.82)' : 'rgba(160,160,170,.55)';
+      ctx.lineWidth   = major ? 2.4 : 1.1;
+      ctx.lineCap     = 'round';
+      ctx.stroke();
+    }
+
+    // ── Hour numbers: 12 / 3 / 6 / 9 ──
+    const numR  = R - 20;
+    const fSize = Math.round(SIZE * 0.115);
+    ctx.font         = `600 ${fSize}px -apple-system, "SF Pro Rounded", Inter, sans-serif`;
+    ctx.fillStyle    = 'rgba(44,44,52,.88)';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    [
+      { n:'12', a: -Math.PI / 2 },
+      { n:'3',  a:  0            },
+      { n:'6',  a:  Math.PI / 2  },
+      { n:'9',  a:  Math.PI      },
+    ].forEach(({ n, a }) => {
+      ctx.fillText(n, CX + Math.cos(a) * numR, CY + Math.sin(a) * numR);
+    });
+
+    // ── Smooth angles ──
+    const secA  = ((S + MS / 1000) / 60) * Math.PI * 2 - Math.PI / 2;
+    const minA  = ((M + S   / 60)  / 60) * Math.PI * 2 - Math.PI / 2;
+    const hourA = ((H + M   / 60)  / 12) * Math.PI * 2 - Math.PI / 2;
+
+    // Hour hand  (short, thick, black)
+    hand(hourA, R * 0.50, R * 0.12, 5,   'rgba(28,28,32,.95)', true);
+    // Minute hand (long, medium, black)
+    hand(minA,  R * 0.72, R * 0.14, 3.5, 'rgba(28,28,32,.90)', true);
+    // Second hand (orange, thin)
+    hand(secA,  R * 0.80, R * 0.20, 1.6, '#ff9500', false);
+
+    // ── Center cap ──
+    // Orange ring
+    ctx.beginPath();
+    ctx.arc(CX, CY, 5.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff9500';
+    ctx.fill();
+    // White dot
+    ctx.beginPath();
+    ctx.arc(CX, CY, 2.8, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+
+    ctx.restore(); // end clip
+  }
+
+  // Animate every frame for smooth second hand sweep
+  (function loop() { draw(); requestAnimationFrame(loop); })();
+}
+
+
+/* ═══════════════════════════
+   WIDGET — DEV QUOTES
+═══════════════════════════ */
+const DEV_QUOTES = [
+  { text: "It works on my machine.", author: "Every Developer, Ever" },
+  { text: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
+  { text: "First, solve the problem. Then, write the code.", author: "John Johnson" },
+  { text: "It's not a bug — it's an undocumented feature.", author: "Anonymous" },
+  { text: "Code is like humor. When you have to explain it, it's bad.", author: "Cory House" },
+  { text: "Any fool can write code a computer can understand. Good programmers write code humans can understand.", author: "Martin Fowler" },
+  { text: "There are only two hard things in CS: cache invalidation and naming things.", author: "Phil Karlton" },
+  { text: "Premature optimization is the root of all evil.", author: "Donald Knuth" },
+  { text: "The best error message is the one that never shows up.", author: "Thomas Fuchs" },
+  { text: "99 little bugs in the code. Take one down, patch it around… 127 little bugs in the code.", author: "Anonymous" },
+  { text: "Without requirements or design, programming is the art of adding bugs to an empty text file.", author: "Louis Srygley" },
+  { text: "Make it work, make it right, make it fast.", author: "Kent Beck" },
+  { text: "Debugging is twice as hard as writing the code. If you write it as cleverly as possible, you're not smart enough to debug it.", author: "Brian Kernighan" },
+  { text: "Every great developer you know got there by solving problems they were unqualified to solve — until they did it.", author: "Patrick McKenzie" },
+  { text: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
+  { text: "A ship in port is safe, but that's not what ships are built for.", author: "Grace Hopper" },
+];
+
+function initQuoteWidget() {
+  const textEl   = document.getElementById('quoteText');
+  const authorEl = document.getElementById('quoteAuthor');
+  const widget   = document.getElementById('quoteWidget');
+  if (!textEl || !widget) return;
+
+  let current = Math.floor(Math.random() * DEV_QUOTES.length);
+
+  function showQuote(q, animate) {
+    if (animate) {
+      textEl.classList.add('fade-out');
+      setTimeout(() => {
+        textEl.textContent   = q.text;
+        authorEl.textContent = `— ${q.author}`;
+        textEl.classList.remove('fade-out');
+      }, 280);
+    } else {
+      textEl.textContent   = q.text;
+      authorEl.textContent = `— ${q.author}`;
+    }
+  }
+
+  showQuote(DEV_QUOTES[current], false);
+
+  widget.addEventListener('click', () => {
+    current = (current + 1) % DEV_QUOTES.length;
+    showQuote(DEV_QUOTES[current], true);
+  });
+  widget.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); widget.click(); }
+  });
+
+  // Auto-rotate every 18s
+  setInterval(() => {
+    current = (current + 1) % DEV_QUOTES.length;
+    showQuote(DEV_QUOTES[current], true);
+  }, 18000);
+}
+
+/* ═══════════════════════════
+   ARCADE: CATCH THE BUG
+═══════════════════════════ */
+const BUG_EMOJIS = ['🐛','🦟','🪲','🐞','🦗','🪳'];
+let bugGame = {
+  score:0, bugs:[], spawnInterval:null,
+  animFrame:null, gameArea:null, gameRunning:false,
+  timerInterval:null, timeLeft:60,
+};
+
+function initBugGame() {
+  const gameArea = document.getElementById('bugGameArea');
+  const scoreEl  = document.getElementById('bugScore');
+  const timerEl  = document.getElementById('bugTimer');
+  const resetBtn = document.getElementById('bugReset');
+  const overlay  = document.getElementById('bugGameOver');
+  const scoreMsg = document.getElementById('bugScoreMsg');
+  const viewBtn  = document.getElementById('bugViewProjects');
+  const againBtn = document.getElementById('bugPlayAgain');
+  if (!gameArea || !scoreEl) return;
+
+  // Kill previous run
+  bugGame.gameRunning = false;
+  cancelAnimationFrame(bugGame.animFrame);
+  clearInterval(bugGame.spawnInterval);
+  clearInterval(bugGame.timerInterval);
+  gameArea.querySelectorAll('.game-bug').forEach(b => b.remove());
+  overlay?.classList.remove('visible');
+
+  bugGame = { score:0, bugs:[], spawnInterval:null, animFrame:null, gameArea, gameRunning:true, timerInterval:null, timeLeft:60 };
+
+  function updateScore() { if (scoreEl) scoreEl.textContent = bugGame.score; }
+  function updateTimer()  {
+    if (!timerEl) return;
+    timerEl.textContent = `${bugGame.timeLeft}s`;
+    timerEl.style.color = bugGame.timeLeft <= 10 ? '#f87171' : '';
+  }
+
+  function spawnBug() {
+    if (!bugGame.gameRunning || bugGame.bugs.length >= 9) return;
+    const W = gameArea.offsetWidth || 600;
+    const H = gameArea.offsetHeight || 400;
+    const SIZE = 34;
+    const bug  = document.createElement('div');
+    bug.className   = 'game-bug';
+    bug.textContent = BUG_EMOJIS[Math.floor(Math.random() * BUG_EMOJIS.length)];
+
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.9 + Math.random() * 1.5;
+    const bugObj = {
+      el:bug, SIZE,
+      x: Math.random() * (W - SIZE),
+      y: Math.random() * (H - SIZE),
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+    };
+    bug.style.left = bugObj.x + 'px';
+    bug.style.top  = bugObj.y + 'px';
+
+    bug.addEventListener('click', e => {
+      e.stopPropagation();
+      if (!bugGame.gameRunning || bug.classList.contains('bug-caught')) return;
+      bug.classList.add('bug-caught');
+      bugGame.score++;
+      updateScore();
+      const idx = bugGame.bugs.indexOf(bugObj);
+      if (idx > -1) bugGame.bugs.splice(idx, 1);
+      setTimeout(() => bug.remove(), 320);
+    });
+
+    gameArea.appendChild(bug);
+    bugGame.bugs.push(bugObj);
+  }
+
+  function gameLoop() {
+    if (!bugGame.gameRunning) return;
+    const W = gameArea.offsetWidth || 600;
+    const H = gameArea.offsetHeight || 400;
+    bugGame.bugs.forEach(b => {
+      b.x += b.vx; b.y += b.vy;
+      if (b.x < 0)          { b.vx =  Math.abs(b.vx); b.x = 0; }
+      if (b.x > W - b.SIZE) { b.vx = -Math.abs(b.vx); b.x = W - b.SIZE; }
+      if (b.y < 0)          { b.vy =  Math.abs(b.vy); b.y = 0; }
+      if (b.y > H - b.SIZE) { b.vy = -Math.abs(b.vy); b.y = H - b.SIZE; }
+      b.el.style.left = b.x + 'px';
+      b.el.style.top  = b.y + 'px';
+    });
+    bugGame.animFrame = requestAnimationFrame(gameLoop);
+  }
+
+  function endGame() {
+    bugGame.gameRunning = false;
+    cancelAnimationFrame(bugGame.animFrame);
+    clearInterval(bugGame.spawnInterval);
+    clearInterval(bugGame.timerInterval);
+    if (scoreMsg) scoreMsg.textContent = bugGame.score;
+    overlay?.classList.add('visible');
+  }
+
+  function resetGame() {
+    overlay?.classList.remove('visible');
+    gameArea.querySelectorAll('.game-bug').forEach(b => b.remove());
+    bugGame.gameRunning = false;
+    cancelAnimationFrame(bugGame.animFrame);
+    clearInterval(bugGame.spawnInterval);
+    clearInterval(bugGame.timerInterval);
+    bugGame.score = 0; bugGame.bugs = []; bugGame.timeLeft = 60;
+    if (timerEl) timerEl.style.color = '';
+    updateScore(); updateTimer();
+    start();
+  }
+
+  function start() {
+    bugGame.gameRunning = true;
+    for (let i = 0; i < 4; i++) setTimeout(spawnBug, i * 280);
+    bugGame.spawnInterval = setInterval(spawnBug, 2000);
+    gameLoop();
+    bugGame.timerInterval = setInterval(() => {
+      bugGame.timeLeft--;
+      updateTimer();
+      if (bugGame.timeLeft <= 0 && bugGame.gameRunning) endGame();
+    }, 1000);
+  }
+
+  // Bind buttons (remove old listeners by cloning)
+  [resetBtn, againBtn, viewBtn].forEach(btn => {
+    if (!btn) return;
+    const clone = btn.cloneNode(true);
+    btn.parentNode.replaceChild(clone, btn);
+  });
+
+  document.getElementById('bugReset')?.addEventListener('click', resetGame);
+  document.getElementById('bugPlayAgain')?.addEventListener('click', resetGame);
+  document.getElementById('bugViewProjects')?.addEventListener('click', () => {
+    closeWindow('arcadeWindow');
+    openWindow('projectsWindow', 'dockFinder');
+  });
+
+  updateScore(); updateTimer();
+  start();
+}
 
