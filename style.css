@@ -2749,95 +2749,7 @@ body::after {
   font-style: italic;
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width:640px) {
-  .safari-start-page {
-    padding: 24px 20px 36px;
-    gap: 40px;
-  }
 
-  .safari-hero-content {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 20px;
-  }
-
-  .safari-profile-img {
-    width: 120px;
-    height: auto;
-    aspect-ratio: 4/5;
-    flex: 0 0 120px;
-  }
-
-  .safari-hero-text {
-    align-items: center;
-  }
-
-  .safari-chips {
-    justify-content: center;
-  }
-
-  .safari-actions {
-    justify-content: center;
-  }
-
-  .safari-hero-titles h2 {
-    font-size: 1.8rem;
-  }
-
-  .safari-two-col {
-    grid-template-columns: 1fr;
-  }
-
-  .win-layout-horizontal {
-    flex-direction: column;
-  }
-
-  .finder-sidebar,
-  .notes-sidebar {
-    width: 100%;
-    min-width: 100%;
-    height: 60px;
-    overflow-x: auto;
-    display: flex;
-    flex-direction: row;
-    padding: 6px;
-    border-right: none;
-    border-bottom: .5px solid rgba(255, 255, 255, .06);
-  }
-
-  .sidebar-heading,
-  .notes-list-heading {
-    display: none;
-  }
-
-  .sidebar-item,
-  .notes-list-item {
-    white-space: nowrap;
-  }
-
-  .resume-body-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dock-tooltip {
-    display: none;
-  }
-
-  .di-img {
-    width: 46px;
-    height: 46px;
-  }
-
-  .desktop-widgets {
-    display: none;
-  }
-
-  .desktop-folders {
-    display: none;
-  }
-}
 
 /* ════════════════════════════════
    DESKTOP WIDGETS
@@ -3774,3 +3686,193 @@ body::after {
     padding: 4px 8px;
     gap: 8px;
 }
+
+/* ── RESPONSIVE ADJUSTMENTS ── */
+@media (max-width: 640px) {
+  /* Hide Widgets and Desktop Folders */
+  .desktop-widgets,
+  .desktop-folders {
+    display: none !important;
+  }
+
+  /* Refine Menu Bar for Mobile */
+  .menu-bar {
+    padding: 0 12px;
+  }
+
+  .menu-item,
+  .menu-divider,
+  .menu-sys-icon,
+  .menu-clock {
+    display: none !important;
+  }
+
+  .menu-brand {
+    font-size: 13.5px;
+    margin-right: 0;
+  }
+
+  /* Refine Dock for Mobile */
+  .dock-shell {
+    padding: 8px 12px;
+    width: 100%;
+    left: 0 !important;
+    translate: 0 0 !important; /* FIXED CENTERING */
+    display: flex;
+    justify-content: center;
+    bottom: 6px;
+  }
+
+  .dock {
+    gap: 12px; /* A bit more space for touch */
+    padding: 8px 14px;
+    border-radius: 20px;
+    width: auto;
+    max-width: 98%;
+  }
+
+  .dock-item {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+  }
+
+  .di-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .dock-tooltip {
+    display: none !important;
+  }
+
+  .dock-sep {
+    height: 18px;
+    margin: 0 2px;
+  }
+
+  /* Make Windows take more space on mobile */
+  .window {
+    width: 94vw !important;
+    height: 80vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    translate: 0 0 !important;
+  }
+
+  .win-projects {
+    width: 94vw !important;
+    height: 82vh !important;
+  }
+
+  /* Safari Mobile Style */
+  .safari-start-page {
+    padding: 24px 16px 36px;
+    gap: 32px;
+  }
+
+  .safari-hero-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 18px;
+  }
+
+  .safari-profile-img {
+    width: 110px;
+    height: 137px;
+    flex: 0 0 110px;
+  }
+
+  .safari-hero-titles h2 {
+    font-size: 1.65rem;
+  }
+
+  .safari-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  /* Finder/Notes Sidebars horizontal on mobile */
+  .win-layout-horizontal {
+    flex-direction: column;
+  }
+
+  .finder-sidebar,
+  .notes-sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: 54px;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    padding: 4px 8px;
+    border-right: none;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .sidebar-heading,
+  .notes-list-heading {
+    display: none;
+  }
+
+  .sidebar-item,
+  .notes-list-item {
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .notes-content,
+  .finder-main {
+    padding: 16px;
+  }
+
+  /* Refine Arcade Game Over for Mobile */
+  .game-over-content {
+    padding: 24px 20px;
+    width: 88%;
+  }
+
+  .game-over-title {
+    font-size: 24px !important;
+    margin-bottom: 8px;
+  }
+
+  .game-over-sub {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .arcade-progress-container {
+    margin: 14px 0;
+    height: 8px;
+  }
+
+  .collected-tech-icons {
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .tech-icon-mini {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .arcade-btn-primary {
+    padding: 10px 20px;
+    font-size: 13.5px;
+    border-radius: 12px;
+  }
+
+  .arcade-btn-secondary {
+    padding: 9px 18px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+}
+
+
