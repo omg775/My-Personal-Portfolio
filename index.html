@@ -308,43 +308,67 @@
           <button class="tl green" aria-label="Maximize"></button>
         </div>
         <div class="mail-toolbar">
-          <div class="win-title-label">Inbox — Mail</div>
-          <button class="mail-compose-btn" onclick="scrollToCompose()">✏️ Compose</button>
+          <div class="win-title-label">Inbox — omgawde775@gmail.com</div>
+          <button class="mail-compose-btn" onclick="scrollToCompose()">✏️ New Message</button>
         </div>
       </div>
       <div class="win-body mail-body">
-        <div class="mail-hero">
-          <div class="mail-hero-icon">📬</div>
-          <h2>Let's Build Something</h2>
-          <p>Open to opportunities, collabs, and interesting conversations.</p>
-        </div>
-        <div class="mail-links" id="mailLinks"></div>
-        <div class="mail-compose" id="mailCompose">
-          <div class="compose-header">
-            <span>✏️</span>
-            <h3>New Message</h3>
+
+        <!-- LEFT: Sidebar list -->
+        <aside class="mail-sidebar">
+          <div class="mail-sidebar-header">
+            <span class="mail-sidebar-label">Contacts</span>
           </div>
-          <div class="compose-field">
-            <label>From</label>
-            <input type="email" id="contactEmail" placeholder="your@email.com" />
+          <div class="mail-links" id="mailLinks"></div>
+          <div class="mail-sidebar-footer">
+            <span>3 contacts</span>
           </div>
-          <div class="compose-field">
-            <label>Subject</label>
-            <input type="text" id="contactSubject" placeholder="Hey Om, let's connect!" />
+        </aside>
+
+        <!-- RIGHT: Compose panel -->
+        <section class="mail-compose" id="mailCompose">
+          <div class="compose-topbar">
+            <span class="compose-topbar-title">New Message</span>
+            <div class="compose-topbar-actions">
+              <button class="compose-topbar-btn" title="Minimize">−</button>
+              <button class="compose-topbar-btn" title="Fullscreen">⤢</button>
+            </div>
           </div>
-          <div class="compose-field compose-field-grow">
-            <label>Body</label>
-            <textarea id="contactMessage" rows="4" placeholder="I'd love to talk about..."></textarea>
+
+          <div class="compose-fields">
+            <div class="compose-field">
+              <label class="compose-label">To</label>
+              <span class="compose-to-addr">omgawde775@gmail.com</span>
+            </div>
+            <div class="compose-divider"></div>
+            <div class="compose-field">
+              <label class="compose-label">From</label>
+              <input type="email" id="contactEmail" placeholder="your@email.com" autocomplete="email" />
+            </div>
+            <div class="compose-divider"></div>
+            <div class="compose-field">
+              <label class="compose-label">Subject</label>
+              <input type="text" id="contactSubject" placeholder="Hey Om, let's connect!" />
+            </div>
+            <div class="compose-divider"></div>
           </div>
-          <button class="compose-send" onclick="sendMail()" id="sendBtn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
-            </svg>
-            Send
-          </button>
-        </div>
+
+          <textarea id="contactMessage" placeholder="Write your message here…"></textarea>
+
+          <div class="compose-footer">
+            <button class="compose-send" onclick="sendMail()" id="sendBtn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
+              </svg>
+              Send
+            </button>
+            <span class="compose-footer-hint">Directly message Om via EmailJS</span>
+          </div>
+        </section>
+
       </div>
     </div>
+
 
     <!-- ── RESUME WINDOW (Preview) ── -->
     <div class="window win-preview" id="resumeWindow" role="dialog" aria-label="Resume">
