@@ -75,7 +75,10 @@ This project aims to:
 
 ## 📸 Preview
 
-(Add screenshots here)
+<img width="2940" height="1672" alt="image" src="https://github.com/user-attachments/assets/1ecac517-c348-4e62-90a8-e2d3dd6a6ad5" />
+<img width="2940" height="1654" alt="image" src="https://github.com/user-attachments/assets/0fc74b51-6444-4f01-b133-b794f215172c" />
+
+
 
 ---
 
