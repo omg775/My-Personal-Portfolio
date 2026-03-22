@@ -49,9 +49,9 @@
       <span class="apple-logo" aria-hidden="true">&#63743;</span>
       <span class="menu-brand">Om Gawde</span>
       <span class="menu-divider" aria-hidden="true"></span>
-      <span class="menu-item" tabindex="0">Portfolio</span>
-      <span class="menu-item" tabindex="0">Work</span>
-      <span class="menu-item" tabindex="0">Contact</span>
+      <span class="menu-item" tabindex="0" onclick="openWindow('projectsWindow','dockFinder')">Portfolio</span>
+      <span class="menu-item" tabindex="0" onclick="openWindow('experienceWindow','dockNotes')">Work</span>
+      <span class="menu-item" tabindex="0" onclick="openWindow('contactWindow','dockMail')">Contact</span>
     </div>
     <div class="menu-right">
       <span class="menu-sys-icon" title="Wifi" aria-hidden="true">
@@ -104,24 +104,24 @@
           <div class="sidebar-section">
             <div class="sidebar-heading">FAVORITES</div>
             <div class="sidebar-item active" data-filter="all">
-              <span class="si-icon">⚡</span> All Projects
+              All Projects
             </div>
             <div class="sidebar-item" data-filter="web">
-              <span class="si-icon">🌐</span> Web Apps
+              Web Apps
             </div>
             <div class="sidebar-item" data-filter="backend">
-              <span class="si-icon">⚙️</span> Backend
+              Backend
             </div>
             <div class="sidebar-item" data-filter="tool">
-              <span class="si-icon">🛠️</span> Tools
+              Tools
             </div>
           </div>
           <div class="sidebar-section">
             <div class="sidebar-heading">TAGS</div>
-            <div class="sidebar-tag react">React</div>
-            <div class="sidebar-tag java">Java</div>
-            <div class="sidebar-tag node">Node.js</div>
-            <div class="sidebar-tag spring">Spring</div>
+            <div class="sidebar-tag react" data-tag="React">React</div>
+            <div class="sidebar-tag java" data-tag="Java">Java</div>
+            <div class="sidebar-tag node" data-tag="Node.js">Node.js</div>
+            <div class="sidebar-tag spring" data-tag="Spring Boot">Spring Boot</div>
           </div>
         </aside>
         <div class="finder-main">
@@ -283,9 +283,9 @@
           </div>
           <div class="notes-list-section">
             <div class="notes-list-heading">All Notes</div>
-            <div class="notes-list-item active">Experience</div>
-            <div class="notes-list-item">Education</div>
-            <div class="notes-list-item">Achievements</div>
+            <div class="notes-list-item active" data-tab="certificates">Certificates (5)</div>
+            <div class="notes-list-item" data-tab="education">Education</div>
+            <div class="notes-list-item" data-tab="achievements">Achievements (5)</div>
           </div>
         </aside>
         <div class="notes-content" id="notesContent">
@@ -309,7 +309,7 @@
         </div>
         <div class="mail-toolbar">
           <div class="win-title-label">Inbox — omgawde775@gmail.com</div>
-          <button class="mail-compose-btn" onclick="scrollToCompose()">✏️ New Message</button>
+          <button class="mail-compose-btn" onclick="scrollToCompose()">New Message</button>
         </div>
       </div>
       <div class="win-body mail-body">
@@ -385,6 +385,11 @@
           </div>
           <span class="preview-label">Resume.pdf</span>
           <div class="preview-actions">
+            <button class="preview-action" onclick="downloadResume()" title="Download PDF">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+              </svg>
+            </button>
             <button class="preview-action" title="Zoom in">+</button>
             <span class="preview-zoom">100%</span>
             <button class="preview-action" title="Zoom out">−</button>
@@ -392,134 +397,31 @@
         </div>
       </div>
       <div class="win-body preview-body">
-        <div class="resume-paper">
-          <div class="resume-header">
-            <div class="resume-header-left">
-              <h1>Om Gawde</h1>
-              <p class="resume-role">Full-Stack Developer · Backend Engineer</p>
-            </div>
-            <div class="resume-header-right">
-              <div class="resume-contact-item">om@example.com</div>
-              <div class="resume-contact-item">github.com/omgawde</div>
-              <div class="resume-contact-item">linkedin.com/in/omgawde</div>
-            </div>
-          </div>
-          <div class="resume-body-grid">
-            <div class="resume-main">
-              <section class="rs">
-                <h3>Summary</h3>
-                <p>Full-stack developer with a focus on building clean, scalable applications. Experienced in Java,
-                  Spring Boot, React, and modern JavaScript ecosystems. Passionate about backend architecture and
-                  developer tooling.</p>
-              </section>
-              <section class="rs">
-                <h3>Experience</h3>
-                <div class="rexp">
-                  <div class="rexp-title">Full-Stack Developer Intern</div>
-                  <div class="rexp-meta">Tech Company · 2025–Present</div>
-                  <p>Built end-to-end features using React + Node.js. Optimized API performance by 40% via Redis caching
-                    and query tuning.</p>
-                </div>
-                <div class="rexp">
-                  <div class="rexp-title">Open Source Contributor</div>
-                  <div class="rexp-meta">GitHub · 2024–Present</div>
-                  <p>Active contributor with consistent commits across REST API utilities, dev tools, and React
-                    component libraries.</p>
-                </div>
-              </section>
-              <section class="rs">
-                <h3>Education</h3>
-                <div class="rexp">
-                  <div class="rexp-title">Bachelor of Computer Science</div>
-                  <div class="rexp-meta">University · 2023–2027</div>
-                  <p>Focus on software engineering, data structures, algorithms, and networking fundamentals.</p>
-                </div>
-              </section>
-            </div>
-            <div class="resume-sidebar">
-              <section class="rs">
-                <h3>Skills</h3>
-                <p><strong>Languages</strong><br />Java, JS/TS, Python, SQL</p>
-                <p><strong>Frameworks</strong><br />Spring Boot, React, Node.js</p>
-                <p><strong>Tools</strong><br />Git, Docker, PostgreSQL, Redis</p>
-              </section>
-              <section class="rs">
-                <h3>Interests</h3>
-                <p>System Design, Microservices, Open Source, Networking</p>
-              </section>
-            </div>
-          </div>
-        </div>
-        <div class="preview-download-bar">
-          <button class="download-btn" onclick="downloadResume()" id="downloadBtn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 4v-2h14v2H5z" />
-            </svg>
-            Download PDF
-          </button>
+        <div class="cv-page" id="resumeContent">
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
 
     <!-- ── IDEAS WINDOW ── -->
-    <div class="window win-ideas" id="ideasWindow" role="dialog" aria-label="Ideas">
+    <!-- ── BUILD LAB WINDOW ── -->
+    <div class="window win-ideas" id="ideasWindow" role="dialog" aria-label="Build Lab">
       <div class="win-chrome">
         <div class="traffic-lights">
           <button class="tl red" onclick="closeWindow('ideasWindow')" aria-label="Close"></button>
           <button class="tl yellow" aria-label="Minimize"></button>
           <button class="tl green" aria-label="Maximize"></button>
         </div>
-        <div class="win-title-label">💡 Ideas.md</div>
+        <div class="win-title-label">Build Lab</div>
         <div class="win-chrome-end"></div>
       </div>
-      <div class="win-body ideas-body">
-        <div class="ideas-header">
-          <div class="ideas-header-icon">💡</div>
-          <div>
-            <h2 class="ideas-title">Startup Ideas & Side Projects</h2>
-            <p class="ideas-subtitle">Things I want to build someday</p>
-          </div>
+      <div class="win-body lab-body">
+        <div class="lab-header">
+          <h2 class="lab-heading">Build <span class="gradient-text">Lab</span></h2>
+          <p class="lab-subtext">Serious product ideas & technical experiments</p>
         </div>
-        <div class="ideas-grid">
-          <div class="idea-card idea-blue">
-            <div class="idea-tag">SaaS</div>
-            <h3>Dev Tools Dashboard</h3>
-            <p>Unified dashboard for developers — GitHub stats, CI/CD status, deployment logs, and alerts in one place.
-            </p>
-            <div class="idea-meta">🔥 High interest · Backend-heavy</div>
-          </div>
-          <div class="idea-card idea-purple">
-            <div class="idea-tag">Open Source</div>
-            <h3>Spring Boot Starter Kit</h3>
-            <p>Opinionated starter for Spring Boot APIs with auth, rate limiting, logging, and Docker compose
-              pre-configured.</p>
-            <div class="idea-meta">⚡ Could ship in a weekend</div>
-          </div>
-          <div class="idea-card idea-green">
-            <div class="idea-tag">Productivity</div>
-            <h3>Code Snippet Manager</h3>
-            <p>A native-feeling snippet vault with tagging, search, and editor plugin support. Better than GitHub Gist.
-            </p>
-            <div class="idea-meta">🌱 Early research phase</div>
-          </div>
-          <div class="idea-card idea-orange">
-            <div class="idea-tag">AI</div>
-            <h3>PR Review Copilot</h3>
-            <p>CLI + GitHub Action that reviews PRs for security, performance, and style issues using LLMs.</p>
-            <div class="idea-meta">🤖 Technically challenging</div>
-          </div>
-          <div class="idea-card idea-teal">
-            <div class="idea-tag">Dev Tool</div>
-            <h3>API Diffing Tool</h3>
-            <p>Compare two API versions and auto-generate a changelog with breaking changes highlighted clearly.</p>
-            <div class="idea-meta">🔧 Solving my own pain</div>
-          </div>
-          <div class="idea-card idea-pink">
-            <div class="idea-tag">Community</div>
-            <h3>Dev Portfolio OS</h3>
-            <p>A template system for macOS-style portfolio websites — ship your portfolio in an hour, not a week.</p>
-            <div class="idea-meta">🌐 This very portfolio!</div>
-          </div>
+        <div class="lab-grid" id="buildLabGrid">
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
@@ -532,59 +434,22 @@
           <button class="tl yellow" aria-label="Minimize"></button>
           <button class="tl green" aria-label="Maximize"></button>
         </div>
-        <div class="win-title-label">📍 Now — March 2026</div>
+        <div class="win-title-label">Now — March 2026</div>
         <div class="win-chrome-end"></div>
       </div>
       <div class="win-body now-body">
-        <div class="now-intro">
-          <div class="now-pulse-dot" aria-hidden="true"></div>
-          <div>
-            <h2 class="now-heading">What I'm doing <span class="gradient-text">right now</span></h2>
-            <p class="now-subtext">Last updated: March 2026 · Inspired by <a href="https://nownownow.com"
-                target="_blank" rel="noopener" class="now-link">nownownow.com</a></p>
+        <div class="now-dashboard-header">
+          <div class="now-status-light">
+            <div class="status-pulse" aria-hidden="true"></div>
+            <span>Status: Active</span>
           </div>
+          <h2 class="now-dashboard-title">What I'm doing <span class="gradient-text">right now</span></h2>
+          <p class="now-dashboard-subtitle">Current focus, learning, and direction</p>
+          <div class="now-last-updated" id="nowUpdateTime">Status active as of March 2026</div>
         </div>
-        <div class="now-sections">
-          <div class="now-section">
-            <div class="now-section-icon">⚡</div>
-            <div class="now-section-content">
-              <h3>Building</h3>
-              <p>Working on a production Spring Boot microservices project — building an auth service with JWT + Redis
-                session management, rate limiting, and Docker deployment.</p>
-            </div>
-          </div>
-          <div class="now-section">
-            <div class="now-section-icon">📚</div>
-            <div class="now-section-content">
-              <h3>Learning</h3>
-              <p>Deep dive into <strong>System Design</strong> — studying distributed systems, consistent hashing, CAP
-                theorem. Also picking up advanced Java concurrency patterns.</p>
-            </div>
-          </div>
-          <div class="now-section">
-            <div class="now-section-icon">🎯</div>
-            <div class="now-section-content">
-              <h3>Focus</h3>
-              <p>Landing an impactful internship or role where I can ship real backend infrastructure. Targeting
-                companies building developer tools or fintech systems.</p>
-            </div>
-          </div>
-          <div class="now-section">
-            <div class="now-section-icon">🌱</div>
-            <div class="now-section-content">
-              <h3>Reading</h3>
-              <p><em>Designing Data-Intensive Applications</em> by Martin Kleppmann. Also following the Java 21 virtual
-                threads and structured concurrency specs closely.</p>
-            </div>
-          </div>
-          <div class="now-section">
-            <div class="now-section-icon">🎵</div>
-            <div class="now-section-content">
-              <h3>Listening</h3>
-              <p>Lo-fi hip-hop while coding. Podcasts: <em>Software Engineering Daily</em> and <em>Lex Fridman</em> for
-                the big-picture thinking hits.</p>
-            </div>
-          </div>
+
+        <div class="now-status-grid" id="nowStatusGrid">
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
@@ -619,12 +484,12 @@
         </div>
         <span class="folder-label">Contact</span>
       </div>
-      <div class="folder-item" id="folderIdeas" data-window="ideasWindow" data-dock="" tabindex="0" role="button"
-        aria-label="Ideas folder">
+      <div class="folder-item" id="folderIdeas" data-window="ideasWindow" tabindex="0" role="button"
+        aria-label="Build Lab folder">
         <div class="folder-icon-wrap">
           <img class="folder-icon" src="assets/folder-yellow.png" alt="" draggable="false" />
         </div>
-        <span class="folder-label">Ideas</span>
+        <span class="folder-label">Build Lab</span>
       </div>
       <div class="folder-item" id="folderNow" data-window="nowWindow" data-dock="" tabindex="0" role="button"
         aria-label="Now folder">
@@ -644,7 +509,7 @@
           <button class="tl yellow" aria-label="Minimize"></button>
           <button class="tl green" aria-label="Maximize"></button>
         </div>
-        <div class="win-title-label">🕹️ Dev Arcade — Tech Stack Quest</div>
+        <div class="win-title-label">Dev Arcade — Tech Stack Quest</div>
         <div class="win-chrome-end"></div>
       </div>
       <div class="win-body arcade-body"
@@ -665,7 +530,7 @@
           <div class="game-over-overlay visible" id="platStartScreen"
             style="background: rgba(0,0,0,0.85); z-index: 10;">
             <div class="game-over-content">
-              <div class="game-over-emoji">👾</div>
+              <div class="game-over-emoji"></div>
               <h2 class="game-over-title">Tech Stack Quest</h2>
               <p class="game-over-sub" style="margin-bottom: 20px;">Support keyboard: Arrows or W/A/S/D to move &
                 jump.<br>Collect Java, Spring Boot, API, and Database.</p>
@@ -674,15 +539,29 @@
               </div>
             </div>
           </div>
-          <!-- GAME OVER / SUCCESS SCREEN -->
-          <div class="game-over-overlay" id="platGameOver" style="background: rgba(0,0,0,0.85); z-index: 10;">
+          <!-- MISSION END OVERLAY -->
+          <div class="game-over-overlay" id="platGameOver">
+            <div class="game-over-glow" aria-hidden="true"></div>
             <div class="game-over-content">
-              <div class="game-over-emoji" id="platEndEmoji">🏆</div>
-              <h2 class="game-over-title" id="platEndTitle">Level Complete!</h2>
-              <p class="game-over-sub">You collected <span id="platScoreMsg">0</span> out of 4 tech items.</p>
+              <div class="arcade-icon-wrap" id="platEndEmoji">💥</div>
+              <h2 class="game-over-title" id="platEndTitle">Mission Failed</h2>
+              
+              <p class="game-over-sub" id="platGameOverSub">Progress: 0 of 4 technologies unlocked</p>
+              
+              <div class="arcade-progress-container">
+                <div class="arcade-progress-bar" id="platProgressBar"></div>
+              </div>
+
+              <div class="collected-tech-icons" id="platTechIcons">
+                <div class="tech-icon-mini" data-tech="Java" title="Java">☕</div>
+                <div class="tech-icon-mini" data-tech="Spring Boot" title="Spring">🍃</div>
+                <div class="tech-icon-mini" data-tech="API" title="API">🔌</div>
+                <div class="tech-icon-mini" data-tech="Database" title="Database">🗄️</div>
+              </div>
+
               <div class="game-over-actions">
-                <button class="btn btn-primary" id="platViewProjects">📁 View Projects</button>
-                <button class="btn btn-ghost" id="platPlayAgain">↺ Play Again</button>
+                <button class="arcade-btn-primary" id="platViewProjects">Explore Your Stack</button>
+                <button class="arcade-btn-secondary" id="platPlayAgain">Retry Quest</button>
               </div>
             </div>
           </div>

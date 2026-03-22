@@ -28,19 +28,81 @@ document.addEventListener("DOMContentLoaded", () => {
    DATA
 ═══════════════════════════ */
 const PROJECTS = [
-  { icon: '🌐', title: 'FullStack Task Manager', desc: 'Real-time task management with kanban board, user auth, and live collaboration.', stack: ['React', 'Node.js', 'MongoDB', 'JWT'], cat: 'web', github: '#', demo: '#' },
-  { icon: '⚡', title: 'Spring Boot REST API', desc: 'Production-ready API — JWT auth, role-based access, PostgreSQL, Docker-ready.', stack: ['Java', 'Spring Boot', 'PostgreSQL', 'Docker'], cat: 'backend', github: '#', demo: '#' },
-  { icon: '🎮', title: '2D Developer Portfolio', desc: 'Interactive portfolio as a 2D Kaboom.js game with explorable areas.', stack: ['JavaScript', 'Kaboom.js', 'Vite'], cat: 'web', github: '#', demo: '#' },
-  { icon: '🔒', title: 'Auth Microservice', desc: 'Standalone auth service — OAuth2, refresh tokens, rate limiting, Redis.', stack: ['Spring Boot', 'Redis', 'JWT', 'Docker'], cat: 'backend', github: '#', demo: '#' },
-  { icon: '📊', title: 'Analytics Dashboard', desc: 'Live charts, date filters, CSV export, WebSocket real-time updates.', stack: ['React', 'Chart.js', 'Node.js', 'WS'], cat: 'web', github: '#', demo: '#' },
-  { icon: '🛠️', title: 'CLI Dev Scaffolder', desc: 'CLI tool that scaffolds full-stack projects with custom templates + git init.', stack: ['Node.js', 'Commander.js', 'Inquirer'], cat: 'tool', github: '#', demo: '#' },
+  {
+    icon: '🧠',
+    title: 'Medinoted AI',
+    desc: 'AI-powered clinical note cleaner and health diary platform with voice transcription, SOAP formatting, sentiment tracking, and intelligent health insights.',
+    stack: ['Python', 'Streamlit', 'Azure OpenAI', 'Whisper', 'Azure'],
+    cat: 'fullstack',
+    github: 'https://github.com/omg775/Medinoted-AI',
+    demo: '#'
+  },
+  {
+    icon: '⚡',
+    title: 'Clarity AI',
+    desc: 'Chrome extension that summarizes notes, extracts key insights, and suggests related topics using AI, with a Spring Boot backend for fast processing.',
+    stack: ['Java', 'Spring Boot', 'Gemini API', 'Chrome Extension', 'JavaScript'],
+    cat: 'tool',
+    github: 'https://github.com/omg775/ClarityAI',
+    demo: '#'
+  },
+  {
+    icon: '🧩',
+    title: 'Real-time Collaborative Whiteboard',
+    desc: 'Distributed whiteboard system showcasing multiple architectures including RPC, RMI, P2P, and WebSockets for real-time collaboration.',
+    stack: ['Java', 'Node.js', 'Socket.io', 'TCP/UDP', 'AWS'],
+    cat: 'backend',
+    github: 'https://github.com/omg775/Real-time-Collaborative-Whiteboard',
+    demo: '#'
+  },
+  {
+    icon: '🖥️',
+    title: 'My Personal Portfolio',
+    desc: 'Interactive macOS-style portfolio with draggable windows, desktop UI, widgets, and a mini-game for an engaging user experience.',
+    stack: ['React', 'JavaScript', 'Tailwind CSS', 'Framer Motion'],
+    cat: 'frontend',
+    github: 'https://github.com/omg775/My-Personal-Portfolio',
+    demo: '#'
+  },
+  {
+    icon: '📅',
+    title: 'Exam Scheduler',
+    desc: 'Full-stack exam scheduling system with a Spring Boot API, PostgreSQL database, and React frontend for managing and visualizing exam data.',
+    stack: ['React', 'Spring Boot', 'PostgreSQL', 'Docker', 'Heroku', 'Vercel'],
+    cat: 'fullstack',
+    github: '#',
+    demo: '#'
+  }
 ];
 
-const EXPERIENCE = [
-  { role: 'Full-Stack Developer Intern', org: 'Tech Company · Internship', date: '2025 – Present', desc: 'Built and maintained full-stack features with React + Node.js. Improved API response times 40% via Redis caching and query optimization.' },
-  { role: 'Open Source Contributor', org: 'GitHub · Self-Directed', date: '2024 – Present', desc: 'Active contributor across REST API utilities, dev tools, and React libraries. Consistent daily commit streak with meaningful contributions.' },
-  { role: 'Bachelor of Computer Science', org: 'University · CS Major', date: '2023 – 2027', desc: 'Core focus on software engineering, data structures, algorithms, and networking. Building production projects alongside coursework.' },
-  { role: 'Self-Directed Learning', org: 'Java · Spring Boot · System Design', date: '2024 – Present', desc: 'Deep-diving into Spring Boot ecosystem, microservices architecture patterns, system design, and distributed systems fundamentals.' },
+const CERTIFICATES = [
+  { title: 'Java Course', org: 'NIX Europe', date: 'Feb 2026', desc: 'Focused on core Java concepts, object-oriented programming, and backend fundamentals.' },
+  { title: 'HSUP – Startup Fundamentals Program', org: 'Hungarian Startup University Program', date: 'Dec 2025', desc: 'Learned entrepreneurship, business planning, and innovation in a startup-focused environment.' },
+  { title: 'Skyscanner – Front-End Engineering Job Simulation', org: 'Forage', date: 'Jan 2026', desc: 'Built a React-based web application in a real-world frontend engineering simulation.' },
+  { title: 'Commonwealth Bank – Software Engineering Simulation', org: 'Forage', date: 'Jan 2026', desc: 'Worked on web development and cybersecurity tasks in a simulated enterprise environment.' },
+  { title: 'Master Java, Spring & Microservices', org: 'Telusko', date: '2026', desc: 'Covered Spring Boot, Spring Security, microservices architecture, Docker, and backend system design.' },
+];
+
+const EDUCATION = {
+  institution: 'University of Dunaújváros',
+  degree: 'BSc Computer Science',
+  date: '2023 – 2027',
+  gpa: '4.7 / 5.0',
+  desc: 'Focused on software engineering, data structures, algorithms, and distributed systems while building real-world projects.',
+  highlights: [
+    'Won TDK Talent Day two years in a row',
+    'Won Google Developers competition among Hungarian universities',
+    'Founded a Computer Science club',
+    'Participant in Hungarian Startup University Program (HSUP)'
+  ]
+};
+
+const ACHIEVEMENTS = [
+  { title: 'Won Google Developers Competition', desc: 'Ranked among top participants in a university-level development competition in Hungary.' },
+  { title: 'TDK Talent Day Winner (2x)', desc: 'Won university talent competition two consecutive years.' },
+  { title: 'Founded Computer Science Club', desc: 'Created and led a student community focused on programming and collaboration.' },
+  { title: 'Built Full-Stack & AI Projects', desc: 'Developed multiple projects using React, Spring Boot, and AI APIs.' },
+  { title: 'Completed Advanced Certifications', desc: 'Completed certifications in Java, Spring Boot, frontend engineering, and software simulations.' },
 ];
 
 const CONTACTS = [
@@ -48,6 +110,291 @@ const CONTACTS = [
   { icon: 'assets/linkedin-icon.png', label: 'LinkedIn', value: 'linkedin.com/in/om-gawde', href: 'https://www.linkedin.com/in/om-gawde-692073272/', bg: 'transparent' },
   { icon: 'assets/github-icon.png', label: 'GitHub', value: 'github.com/omg775', href: 'https://github.com/omg775', bg: 'transparent' },
 ];
+
+const RESUME_DATA = {
+  name: "OM GAWDE",
+  contact: {
+    email: "omgawde775@gmail.com",
+    phone: "H: +36707417255 | M: +36707417255",
+    address: "Ulloi ut 61, Budapest Hungary",
+    linkedin: "https://www.linkedin.com/in/omgawde/",
+    github: "https://github.com/omg775"
+  },
+  summary: "Computer Science student with a strong foundation in programming, problem-solving, and software development. Familiar with Java, frontend technologies, and AI concepts, with hands-on experience through projects, camps, and practical learning. Motivated to apply technical skills in real-world applications and continue growing as a developer.",
+  experience: [
+    {
+      role: "Camp Counsellor",
+      org: "Camp America",
+      date: "Jun 2025 - Aug 2025",
+      desc: "Worked as a Resident Counselor in the United States during the summer, where I supported incoming students by helping them transition into university life. Responsibilities included assisting with orientation, accommodation, and day-to-day guidance to ensure students settled smoothly into their new academic environment. The role required strong communication and interpersonal skills while working with diverse cultural backgrounds. Additionally, I had the opportunity to attend selected classes at various universities, gaining exposure to different academic systems and teaching styles."
+    },
+    {
+      role: "Data Analyst",
+      org: "Cretech Engineering",
+      date: "2022 - 2023",
+      desc: "Worked as a Data Analyst at Cretech, where I created and maintained Excel spreadsheets to analyze company data and support decision-making. Assisted the accounting department by organizing financial records, tracking expenses, and ensuring data accuracy. Gained practical experience in data handling, reporting, and cross-department collaboration before beginning my Bachelor's studies in Hungary."
+    }
+  ],
+  education: {
+    institution: "UNIVERSITY OF DUNAUJVAROS",
+    degree: "Bachelors in Computer Science Engineering",
+    desc: "Achieved consecutive wins at science fairs by designing an aviation radar system, demonstrating strong programming and problem-solving skills. Co-founded a Computer Science Club, growing a collaborative tech community, and won the Google Developer Student Clubs (GDSC) competition against teams from multiple Hungarian universities, highlighting technical excellence, teamwork, and leadership."
+  },
+  certifications: [
+    { title: "Java Course — NIX Europe (Feb 2026)", desc: "Covered core Java, OOP principles, and backend fundamentals." },
+    { title: "Startup Fundamentals Program (HSUP) — Hungarian Startup University (Dec 2025)", desc: "Gained knowledge in entrepreneurship, business strategy, and innovation." },
+    { title: "Front-End Engineering Job Simulation — Skyscanner (Forage) (Jan 2026)", desc: "Built a React-based application in a real-world frontend engineering simulation." },
+    { title: "Software Engineering Job Simulation — Commonwealth Bank (Forage) (Jan 2026)", desc: "Completed tasks in web development and cybersecurity within a simulated enterprise environment." },
+    { title: "Master Java, Springboot, SpringAI, Docker & Microservices — Telusko (2026)", desc: "Learned Spring Boot, Spring Security, microservices architecture, and Docker." }
+  ],
+  skills: {
+    languages: "Java, Python",
+    frameworks: "Spring, Hibernate, React, React Native, Streamlit",
+    databases: "PostgreSQL, MySQL, SQLite, Supabase",
+    devops: "Git, GitHub, GitLab, GitHub Actions, Docker, AWS, Azure, Vercel, Netlify",
+    tools: "Windows Terminal, Bash Scripting, Apache Maven, Apache Tomcat, Vite, Postman",
+    design: "Figma, Canva, Adobe Illustrator"
+  },
+  projects: [
+    {
+      title: "Clarity AI — Chrome Extension + Spring Boot Backend",
+      bullets: [
+        "Built an AI-powered Chrome extension to summarize notes, extract key insights, and suggest related topics using the Gemini API.",
+        "Developed a scalable backend with Spring Boot and integrated real-time API processing for fast responses."
+      ]
+    },
+    {
+      title: "Medinoted AI — Full-Stack AI Health Platform",
+      bullets: [
+        "Developed a clinical note cleaner and AI health diary with voice transcription, SOAP formatting, and sentiment analysis.",
+        "Implemented speech-to-text using Whisper and generated insights using Azure OpenAI, with data visualization for tracking user health trends."
+      ]
+    },
+    {
+      title: "Real-Time Collaborative Whiteboard — Distributed Systems Project",
+      bullets: [
+        "Designed a real-time whiteboard system exploring multiple architectures including RPC, RMI, P2P, and WebSockets.",
+        "Implemented scalable communication models and demonstrated system design concepts such as distributed state and real-time synchronization."
+      ]
+    }
+  ],
+  awards: "Google Developer Student Clubs (GDSC) Competition Winner. Won against teams from multiple Hungarian universities, demonstrating technical excellence, teamwork, and leadership."
+};
+
+let resumeRendered = false;
+function renderResume() {
+  const container = document.getElementById('resumeContent');
+  if (!container) return;
+
+  const r = RESUME_DATA;
+  container.innerHTML = `
+    <header class="cv-header">
+      <h1>${r.name}</h1>
+      <div class="cv-contact">
+        <p>${r.contact.email} | ${r.contact.phone}</p>
+        <p>${r.contact.address}</p>
+        <p>LinkedIn: <a href="${r.contact.linkedin}" target="_blank">${r.contact.linkedin}</a> | GitHub: <a href="${r.contact.github}" target="_blank">${r.contact.github}</a></p>
+      </div>
+    </header>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">SUMMARY</h2>
+      <p class="cv-text">${r.summary}</p>
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">EXPERIENCE</h2>
+      ${r.experience.map(exp => `
+        <div class="cv-item">
+          <div class="cv-item-header">
+            <strong>${exp.org}, ${exp.role}</strong>
+            <span class="cv-date">${exp.date}</span>
+          </div>
+          <p class="cv-text">${exp.desc}</p>
+        </div>
+      `).join('')}
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">EDUCATION</h2>
+      <div class="cv-item">
+        <div class="cv-item-header">
+          <strong>${r.education.institution}</strong>
+        </div>
+        <p class="cv-sub">${r.education.degree}</p>
+        <p class="cv-text">${r.education.desc}</p>
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">LICENSES & CERTIFICATIONS</h2>
+      ${r.certifications.map(c => `
+        <div class="cv-item">
+          <div class="cv-item-header" style="font-weight:700; font-size:13.5px; margin-bottom: 2px;">
+            ${c.title}
+          </div>
+          <p class="cv-text">${c.desc}</p>
+        </div>
+      `).join('')}
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">SKILLS</h2>
+      <ul class="cv-list">
+        <li><strong>Languages:</strong> ${r.skills.languages}</li>
+        <li><strong>Frameworks & Libraries:</strong> ${r.skills.frameworks}</li>
+        <li><strong>Databases:</strong> ${r.skills.databases}</li>
+        <li><strong>DevOps & Cloud:</strong> ${r.skills.devops}</li>
+        <li><strong>Tools & Environments:</strong> ${r.skills.tools}</li>
+        <li><strong>Design:</strong> ${r.skills.design}</li>
+      </ul>
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">HONORS & AWARDS</h2>
+      <p class="cv-text">${r.awards}</p>
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">PROJECTS</h2>
+      ${r.projects.map(p => `
+        <div class="cv-item">
+          <div class="cv-item-header">
+            <strong>${p.title}</strong>
+          </div>
+          <ul class="cv-list">
+            ${p.bullets.map(b => `<li>${b}</li>`).join('')}
+          </ul>
+        </div>
+      `).join('')}
+    </section>
+  `;
+}
+
+const NOW_STATUS = [
+  {
+    title: "Building",
+    color: "green",
+    desc: "Developing a production-ready Spring Boot microservices system with JWT authentication, Redis session management, and Docker deployment.",
+    tags: ["Spring Boot", "Redis", "JWT", "Docker"]
+  },
+  {
+    title: "Learning",
+    color: "purple",
+    desc: "Deep dive into system design concepts including distributed systems, consistent hashing, CAP theorem, and advanced Java concurrency patterns.",
+    tags: ["System Design", "Distributed Systems", "Java Concurrency"]
+  },
+  {
+    title: "Focus",
+    color: "blue",
+    desc: "Targeting backend-focused internship opportunities where I can build scalable systems and work on developer tools or fintech infrastructure.",
+    tags: ["Backend", "Microservices", "Fintech"]
+  }
+];
+
+function renderNow() {
+  const container = document.getElementById('nowStatusGrid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const now = new Date();
+  const timeStr = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const timeEl = document.getElementById('nowUpdateTime');
+  if (timeEl) timeEl.textContent = `Status active as of ${timeStr}`;
+
+  NOW_STATUS.forEach((status, i) => {
+    const card = document.createElement('div');
+    card.className = `status-card status-${status.color}`;
+    card.style.setProperty('--delay', `${i * 0.12}s`);
+    
+    card.innerHTML = `
+      <div class="status-card-header">
+        <div class="status-orb"></div>
+        <h3>${status.title}</h3>
+      </div>
+      <p>${status.desc}</p>
+      <div class="status-tags">
+        ${status.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+const BUILD_LAB = [
+  {
+    title: "Dev Tools Dashboard",
+    cat: "SaaS",
+    status: "Planning",
+    desc: "Unified dashboard for developers combining GitHub activity, CI/CD status, and deployment logs.",
+    link: "https://github.com/features/actions"
+  },
+  {
+    title: "Spring Boot Starter Kit",
+    cat: "Open Source",
+    status: "Idea",
+    desc: "Pre-configured Spring Boot template with authentication, logging, rate limiting, and Docker setup.",
+    link: "https://spring.io/projects/spring-boot"
+  },
+  {
+    title: "Code Snippet Manager",
+    cat: "Productivity",
+    status: "Exploring",
+    desc: "A searchable snippet vault with tagging, editor integrations, and local-first storage.",
+    link: "https://www.raycast.com/extensions/snippets"
+  },
+  {
+    title: "PR Review Assistant",
+    cat: "AI",
+    status: "Planning",
+    desc: "Tool that analyzes pull requests for code quality, performance issues, and security risks using AI.",
+    link: "https://github.com/features/code-review"
+  },
+  {
+    title: "API Diffing Tool",
+    cat: "Dev Tool",
+    status: "Idea",
+    desc: "Compare API versions and generate changelogs with breaking changes highlighted automatically.",
+    link: "https://swagger.io/tools/swagger-diff/"
+  },
+  {
+    title: "Developer Portfolio OS",
+    cat: "Community",
+    status: "Exploring",
+    desc: "A customizable system for building interactive, OS-style developer portfolios.",
+    link: "https://github.com/topics/portfolio"
+  }
+];
+
+function renderBuildLab() {
+  const container = document.getElementById('buildLabGrid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  BUILD_LAB.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'lab-card';
+    card.style.setProperty('--delay', `${i * 0.1}s`);
+    
+    card.innerHTML = `
+      <div class="lab-card-top">
+        <span class="lab-cat">${item.cat}</span>
+        <span class="lab-status status-${item.status.toLowerCase()}">${item.status}</span>
+      </div>
+      <h3 class="lab-title">${item.title}</h3>
+      <p class="lab-desc">${item.desc}</p>
+      <div class="lab-footer">
+        <a href="${item.link}" target="_blank" class="lab-link-btn" rel="noopener">
+          Reference
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:4px">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
+          </svg>
+        </a>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
 
 const SKILLS = [
   { cat: 'Languages', items: ['Java', 'PHP', 'Octave'] },
@@ -170,6 +517,9 @@ function openWindow(winId, dockId) {
   if (winId === 'projectsWindow') renderProjects();
   if (winId === 'experienceWindow') renderExperience();
   if (winId === 'contactWindow') renderContacts();
+  if (winId === 'resumeWindow') renderResume();
+  if (winId === 'ideasWindow') renderBuildLab();
+  if (winId === 'nowWindow') renderNow();
   if (winId === 'skillsWindow' && !terminalDone) setTimeout(animateTerminal, 180);
   if (winId === 'arcadeWindow') setTimeout(initPlatformerGame, 80);
 }
@@ -200,8 +550,8 @@ function renderProjects() {
     const card = document.createElement('div');
     card.className = 'project-card';
     card.dataset.cat = p.cat;
+    card.dataset.index = i; // Store index for easier filtering
     card.innerHTML = `
-      <span class="pc-icon">${p.icon}</span>
       <div class="pc-title">${p.title}</div>
       <p class="pc-desc">${p.desc}</p>
       <div class="pc-stack">${p.stack.map(s => `<span class="stack-pill">${s}</span>`).join('')}</div>
@@ -225,15 +575,73 @@ function renderProjects() {
     }, i * 65);
   });
 
-  // sidebar filter
+  // Filter state
+  let currentCategory = 'all';
+  let selectedTags = [];
+
+  function updateFiltering() {
+    const projectCards = document.querySelectorAll('.project-card');
+
+    projectCards.forEach(card => {
+      const cardCat = card.dataset.cat;
+      const projectData = PROJECTS[card.dataset.index];
+
+      const matchCat = currentCategory === 'all' || cardCat === currentCategory;
+      const matchTags = selectedTags.length === 0 || selectedTags.every(t => projectData.stack.includes(t));
+
+      const shouldShow = matchCat && matchTags;
+
+      if (shouldShow) {
+        const wasHidden = card.classList.contains('hidden') || card.style.display === 'none';
+        if (wasHidden) {
+          card.style.display = '';
+          // Force layout for animation
+          card.getBoundingClientRect();
+          card.classList.remove('hidden');
+        }
+      } else {
+        if (!card.classList.contains('hidden')) {
+          card.classList.add('hidden');
+          // Wait for transition before display: none
+          setTimeout(() => {
+            if (card.classList.contains('hidden')) {
+              card.style.display = 'none';
+            }
+          }, 300);
+        }
+      }
+    });
+  }
+
+  // sidebar category filter
   document.querySelectorAll('.sidebar-item[data-filter]').forEach(el => {
     el.addEventListener('click', () => {
-      document.querySelectorAll('.sidebar-item[data-filter]').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.sidebar-item').forEach(x => x.classList.remove('active'));
       el.classList.add('active');
-      const filter = el.dataset.filter;
-      document.querySelectorAll('.project-card').forEach(card => {
-        card.style.display = (filter === 'all' || card.dataset.cat === filter) ? '' : 'none';
-      });
+      currentCategory = el.dataset.filter;
+
+      // If "All Projects" (all) is clicked, also reset tags
+      if (currentCategory === 'all') {
+        selectedTags = [];
+        document.querySelectorAll('.sidebar-tag').forEach(t => t.classList.remove('active'));
+      }
+
+      updateFiltering();
+    });
+  });
+
+  // sidebar tag filter
+  document.querySelectorAll('.sidebar-tag[data-tag]').forEach(el => {
+    el.addEventListener('click', () => {
+      const tag = el.dataset.tag;
+      if (selectedTags.includes(tag)) {
+        selectedTags = selectedTags.filter(t => t !== tag);
+        el.classList.remove('active');
+      } else {
+        selectedTags.push(tag);
+        el.classList.add('active');
+      }
+      updateFiltering();
     });
   });
 }
@@ -252,31 +660,94 @@ function setProjectView(mode) {
 /* ═══════════════════════════
    RENDER: EXPERIENCE
 ═══════════════════════════ */
-let expRendered = false;
+let notesInited = false;
 function renderExperience() {
-  if (expRendered) return;
-  expRendered = true;
-  const container = document.getElementById('expTimeline');
-  if (!container) return;
-  EXPERIENCE.forEach((e, i) => {
-    const el = document.createElement('div');
-    el.className = 'exp-item';
-    el.innerHTML = `
-      <div class="exp-row">
-        <div class="exp-role">${e.role}</div>
-        <div class="exp-date">${e.date}</div>
-      </div>
-      <div class="exp-org">${e.org}</div>
-      <p class="exp-desc">${e.desc}</p>`;
-    el.style.opacity = '0';
-    el.style.transform = 'translateX(-12px)';
-    container.appendChild(el);
-    setTimeout(() => {
-      el.style.transition = 'opacity .35s ease, transform .35s ease';
-      el.style.opacity = '1';
-      el.style.transform = 'translateX(0)';
-    }, i * 100);
+  if (notesInited) return;
+  notesInited = true;
+
+  const tabs = document.querySelectorAll('.notes-list-item[data-tab]');
+  tabs.forEach(tabEl => {
+    tabEl.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tabEl.classList.add('active');
+      renderNotesContent(tabEl.dataset.tab);
+    });
   });
+
+  // Default tab
+  renderNotesContent('certificates');
+}
+
+function renderNotesContent(tab) {
+  const container = document.getElementById('expTimeline');
+  const titleEl = document.querySelector('.notes-title');
+  const dateEl = document.querySelector('.notes-date');
+  if (!container || !titleEl || !dateEl) return;
+
+  container.innerHTML = '';
+  container.parentElement.scrollTop = 0;
+
+  let content = [];
+  let title = '';
+  let countText = '';
+
+  if (tab === 'certificates') {
+    title = 'Certificates';
+    content = CERTIFICATES;
+    countText = `Updated March 2026 · ${CERTIFICATES.length} items`;
+  } else if (tab === 'education') {
+    title = 'Education';
+    countText = `Updated March 2026 · 1 item`;
+    const edu = EDUCATION;
+    const el = document.createElement('div');
+    el.className = 'edu-content';
+    el.innerHTML = `
+      <div class="edu-header">
+        <div class="edu-institution">${edu.institution}</div>
+        <div class="edu-degree">${edu.degree} · ${edu.date}</div>
+        <div class="edu-gpa">GPA: ${edu.gpa}</div>
+      </div>
+      <p class="edu-desc">${edu.desc}</p>
+      <div class="edu-highlights">
+        <div class="edu-h-title">Highlights:</div>
+        <ul>${edu.highlights.map(h => `<li>${h}</li>`).join('')}</ul>
+      </div>`;
+    applyNoteAnimation(el, 0);
+    container.appendChild(el);
+  } else if (tab === 'achievements') {
+    title = 'Achievements';
+    content = ACHIEVEMENTS;
+    countText = `Updated March 2026 · ${ACHIEVEMENTS.length} items`;
+  }
+
+  titleEl.textContent = title;
+  dateEl.textContent = countText;
+
+  if (tab !== 'education') {
+    content.forEach((item, i) => {
+      const el = document.createElement('div');
+      el.className = 'note-item';
+      el.innerHTML = `
+        <div class="note-item-header">
+          <div class="note-item-title">${item.title}</div>
+          ${item.date ? `<div class="note-item-date">${item.date}</div>` : ''}
+        </div>
+        ${item.org ? `<div class="note-item-org">${item.org}</div>` : ''}
+        <p class="note-item-desc">${item.desc}</p>`;
+      applyNoteAnimation(el, i);
+      container.appendChild(el);
+    });
+  }
+}
+
+function applyNoteAnimation(el, index) {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(10px)';
+  el.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+  setTimeout(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  }, index * 60 + 20);
 }
 
 /* ═══════════════════════════
@@ -363,20 +834,20 @@ async function sendMail() {
   const message = document.getElementById('contactMessage')?.value.trim();
 
   if (!email || !subject || !message) {
-    showToast('⚠️ Please fill in all fields.');
+    showToast('Please fill in all fields.');
     return;
   }
 
   // Basic email validation
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showToast('⚠️ Please enter a valid email address.');
+    showToast('Please enter a valid email address.');
     return;
   }
 
   try {
     btn.disabled = true;
     btn.style.opacity = '0.5';
-    showToast('✉️ Sending message...');
+    showToast('Sending message...');
 
     // We use Web3Forms (https://web3forms.com/) - Simple, free, no backend.
     // Replace 'YOUR_ACCESS_KEY_HERE' with the key you get from their website.
@@ -394,18 +865,18 @@ async function sendMail() {
     const result = await response.json();
 
     if (result.success) {
-      showToast('✅ Message sent successfully!');
+      showToast('Message sent successfully!');
       // Clear form
       document.getElementById('contactEmail').value = '';
       document.getElementById('contactSubject').value = '';
       document.getElementById('contactMessage').value = '';
     } else {
-      showToast('❌ Error: ' + result.message);
+      showToast('Error: ' + result.message);
     }
 
   } catch (err) {
     console.error("Form Error:", err);
-    showToast('❌ Connection error. Try again.');
+    showToast('Connection error. Try again.');
   } finally {
     btn.disabled = false;
     btn.style.opacity = '1';
@@ -413,7 +884,43 @@ async function sendMail() {
 }
 
 function downloadResume() {
-  showToast('📄 Resume download coming soon!');
+  const resume = document.getElementById('resumeContent');
+  if (!resume) return;
+  
+  showToast('Preparing document…');
+  
+  const printWin = window.open('', '_blank');
+  const styles = Array.from(document.styleSheets)
+    .filter(s => !s.href || s.href.includes(window.location.origin))
+    .map(s => {
+      try { return Array.from(s.cssRules).map(r => r.cssText).join(''); }
+      catch(e) { return ''; }
+    }).join('');
+
+  printWin.document.write(`
+    <html>
+      <head>
+        <title>Om Gawde - Resume</title>
+        <style>
+          ${styles}
+          body { background: white !important; padding: 0 !important; margin: 0 !important; }
+          .cv-page { box-shadow: none !important; margin: 0 !important; width: 100% !important; max-width: none !important; }
+          @page { margin: 2cm; }
+        </style>
+      </head>
+      <body>
+        <div class="cv-page">${resume.innerHTML}</div>
+        <script>
+          window.onload = () => {
+            setTimeout(() => {
+              window.print();
+            }, 500);
+          };
+        </script>
+      </body>
+    </html>
+  `);
+  printWin.document.close();
 }
 
 /* ═══════════════════════════
@@ -445,9 +952,7 @@ function initDockMagnification() {
       const max = 130;
       if (dist < max) {
         const t = 1 - dist / max;
-        const scale = 1 + t * 0.45;
-        const lift = t * 18;
-        item.style.transform = `translateY(-${lift}px) scale(${scale})`;
+        item.style.transform = `translateY(-${t * 18}px) scale(${1 + t * 0.45})`;
       } else {
         item.style.transform = '';
       }
@@ -545,7 +1050,7 @@ function initFolders() {
       folder.classList.add('opening');
       folder.addEventListener('animationend', () => folder.classList.remove('opening'), { once: true });
       openWindow(winId, dockId);
-      showToast(`📂 Opening ${folder.querySelector('.folder-label').textContent}…`, 1800);
+      showToast(`Opening ${folder.querySelector('.folder-label').textContent}…`, 1800);
     });
 
     // ── Keyboard ──
@@ -568,10 +1073,13 @@ function initFolders() {
     const desk = desktop.getBoundingClientRect();
     const fw = folderDrag.el.offsetWidth;
     const fh = folderDrag.el.offsetHeight;
+    
+    // Calculate new position based on delta
     const nl = Math.max(0, Math.min(desk.width - fw, folderDrag.ox + dx));
-    const nt = Math.max(0, Math.min(desk.height - fh - 10, folderDrag.ox !== folderDrag.ox ? 0 : folderDrag.oy + dy));
+    const nt = Math.max(0, Math.min(desk.height - fh - 10, folderDrag.oy + dy));
+    
     folderDrag.el.style.left = nl + 'px';
-    folderDrag.el.style.top = (Math.max(0, Math.min(desk.height - fh - 10, folderDrag.oy + dy))) + 'px';
+    folderDrag.el.style.top = nt + 'px';
   });
 
   // ── Global folder mouseup ──
@@ -920,18 +1428,45 @@ function initPlatformerGame() {
   const domPlayAgain = document.getElementById('platPlayAgain');
   const domViewProj = document.getElementById('platViewProjects');
 
-  function endGame(win, score) {
-    if (platScoreMsg) platScoreMsg.textContent = score;
-    if (platEndTitle) platEndTitle.textContent = win ? "Level Complete!" : "Game Over";
-    if (platEndEmoji) platEndEmoji.textContent = win ? "🏆" : "💥";
-    overlayOver?.classList.add('visible');
-  }
-
-  async function startKaboom() {
-    overlayStart.classList.remove('visible');
-    overlayOver.classList.remove('visible');
+    let collectedStacks = [];
     currentScore = 0;
     if (platScore) platScore.textContent = currentScore;
+
+    function endGame(win, score) {
+      if (platEndTitle) platEndTitle.textContent = win ? "Run Complete!" : "Mission Failed";
+      if (platEndEmoji) platEndEmoji.textContent = ""; // Emoji removed
+      
+      if (platGameOverSub) {
+        platGameOverSub.textContent = `Progress: ${score} of 4 technologies unlocked`;
+      }
+
+      const progressBar = document.getElementById('platProgressBar');
+      if (progressBar) {
+        progressBar.style.width = (score / 4 * 100) + '%';
+      }
+
+      // Highlight icons
+      const iconContainer = document.getElementById('platTechIcons');
+      if (iconContainer) {
+        iconContainer.querySelectorAll('.tech-icon-mini').forEach(icon => {
+          const tech = icon.dataset.tech;
+          if (collectedStacks.includes(tech)) {
+            icon.classList.add('active');
+          } else {
+            icon.classList.remove('active');
+          }
+        });
+      }
+
+      overlayOver?.classList.add('visible');
+    }
+
+    async function startKaboom() {
+      overlayStart.classList.remove('visible');
+      overlayOver.classList.remove('visible');
+      collectedStacks = [];
+      currentScore = 0;
+      if (platScore) platScore.textContent = currentScore;
 
     // Clean up previous canvas if any
     if (kaboomInst) {
@@ -1080,6 +1615,7 @@ function initPlatformerGame() {
           k.lifespan(0.8, { fade: 0.1 })
         ]);
         score++;
+        collectedStacks.push(item.name);
         if (platScore) platScore.textContent = score;
       });
 
