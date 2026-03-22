@@ -832,6 +832,7 @@ body::after {
   background: linear-gradient(135deg, rgba(109, 106, 255, .07), transparent 60%);
   opacity: 0;
   transition: opacity .25s;
+  pointer-events: none;
 }
 
 .project-card:hover {
