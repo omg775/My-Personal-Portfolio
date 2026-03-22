@@ -50,12 +50,12 @@ const CONTACTS = [
 ];
 
 const SKILLS = [
-  { cat:'Languages',             items:['Java','JavaScript / TypeScript','Python','SQL','HTML & CSS'] },
-  { cat:'Frameworks & Libraries',items:['Spring Boot','React','Node.js','Express.js'] },
-  { cat:'Backend & APIs',        items:['REST APIs','JWT Auth','Redis','WebSockets','Microservices'] },
-  { cat:'Databases',             items:['PostgreSQL','MongoDB','MySQL'] },
-  { cat:'Tools & DevOps',        items:['Git & GitHub','Docker','Linux / Bash','Vite'] },
-  { cat:'Currently Learning',    items:['Spring Boot (Advanced)','System Design','Networking Fundamentals','Cloud Infrastructure'] },
+  { cat:'Languages',             items:['Java','PHP','Octave'] },
+  { cat:'Frameworks & Libraries',items:['Spring','Hibernate','React','React Native','Streamlit'] },
+  { cat:'Databases',             items:['Postgres','MySQL','SQLite','Supabase'] },
+  { cat:'DevOps & Cloud',        items:['Git','GitHub','GitLab','GitHub Actions','Docker','AWS','Azure','Vercel','Netlify'] },
+  { cat:'Tools & Environments',  items:['Windows Terminal','Bash Script','Apache Maven','Apache Tomcat','Vite','Postman'] },
+  { cat:'Design',                items:['Figma','Canva','Adobe Illustrator'] },
 ];
 
 /* ═══════════════════════════
@@ -322,7 +322,7 @@ async function animateTerminal() {
   await wait(320);
   addLine('tcmt', '# Loading skill manifest…');
   await wait(540);
-  addLine('tsuc', '✓ Resolved 34 skills across 6 categories');
+  addLine('tsuc', '✓ Resolved 30 skills across 6 categories');
   await wait(260);
   addLine('tl-row', '');
 
@@ -613,9 +613,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initClockWidget();
   initQuoteWidget();
 
+  // Welcome window auto-open disabled successfully
+  /*
   setTimeout(() => {
     document.getElementById('welcomeWindow')?.classList.add('active');
   }, 150);
+  */
 });
 
 
