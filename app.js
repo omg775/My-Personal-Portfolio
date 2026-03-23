@@ -909,7 +909,11 @@ function downloadResume() {
         </style>
       </head>
       <body>
-        <div class="cv-page">${resume.innerHTML}</div>
+        <div class="cv-page" id="resumeContent">${resume.innerHTML}</div>
+        <style>
+          #resumeContent { visibility: visible !important; transform: none !important; }
+          #resumeContent * { visibility: visible !important; }
+        </style>
         <script>
           window.onload = () => {
             setTimeout(() => {
