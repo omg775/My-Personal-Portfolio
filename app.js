@@ -1,4 +1,21 @@
 /* ═══════════════════════════
+   HELPERS
+═══════════════════════════ */
+function isMobileView() {
+  return window.matchMedia("(max-width: 640px)").matches;
+}
+
+function resetWindowPosition(winEl) {
+  if (!winEl) return;
+  winEl.classList.remove('win-positioned', 'win-dragging');
+  winEl.style.left = '';
+  winEl.style.top = '';
+  winEl.style.transform = '';
+  winEl.style.translate = '';
+  winEl.style.animation = '';
+}
+
+/* ═══════════════════════════
    BOOT SCREEN INIT
 ═══════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -8,12 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (bootScreen && bootProgressBar) {
     document.body.style.overflow = "hidden";
 
-    // Animate progress bar
     setTimeout(() => {
       bootProgressBar.style.width = "100%";
     }, 100);
 
-    // After animation completes, fade out
     setTimeout(() => {
       bootScreen.style.opacity = "0";
       setTimeout(() => {
@@ -181,7 +196,450 @@ const RESUME_DATA = {
   awards: "Google Developer Student Clubs (GDSC) Competition Winner. Won against teams from multiple Hungarian universities, demonstrating technical excellence, teamwork, and leadership."
 };
 
+const NOW_STATUS = [
+  {
+    title: "Building",
+    color: "green",
+    desc: "Developing a production-ready Spring Boot microservices system with JWT authentication, Redis session management, and Docker deployment.",
+    tags: ["Spring Boot", "Redis", "JWT", "Docker"]
+  },
+  {
+    title: "Learning",
+    color: "purple",
+    desc: "Deep dive into system design concepts including distributed systems, consistent hashing, CAP theorem, and advanced Java concurrency patterns.",
+    tags: ["System Design", "Distributed Systems", "Java Concurrency"]
+  },
+  {
+    title: "Focus",
+    color: "blue",
+    desc: "Targeting backend-focused internship opportunities where I can build scalable systems and work on developer tools or fintech infrastructure.",
+    tags: ["Backend", "Microservices", "Fintech"]
+  }
+];
+
+const BUILD_LAB = [
+  {
+    title: "Dev Tools Dashboard",
+    cat: "SaaS",
+    status: "Planning",
+    desc: "Unified dashboard for developers combining GitHub activity, CI/CD status, and deployment logs.",
+    link: "https://github.com/features/actions"
+  },
+  {
+    title: "Spring Boot Starter Kit",
+    cat: "Open Source",
+    status: "Idea",
+    desc: "Pre-configured Spring Boot template with authentication, logging, rate limiting, and Docker setup.",
+    link: "https://spring.io/projects/spring-boot"
+  },
+  {
+    title: "Code Snippet Manager",
+    cat: "Productivity",
+    status: "Exploring",
+    desc: "A searchable snippet vault with tagging, editor integrations, and local-first storage.",
+    link: "https://www.raycast.com/extensions/snippets"
+  },
+  {
+    title: "PR Review Assistant",
+    cat: "AI",
+    status: "Planning",
+    desc: "Tool that analyzes pull requests for code quality, performance issues, and security risks using AI.",
+    link: "https://github.com/features/code-review"
+  },
+  {
+    title: "API Diffing Tool",
+    cat: "Dev Tool",
+    status: "Idea",
+    desc: "Compare API versions and generate changelogs with breaking changes highlighted automatically.",
+    link: "https://swagger.io/tools/swagger-diff/"
+  },
+  {
+    title: "Developer Portfolio OS",
+    cat: "Community",
+    status: "Exploring",
+    desc: "A customizable system for building interactive, OS-style developer portfolios.",
+    link: "https://github.com/topics/portfolio"
+  }
+];
+
+const SKILLS = [
+  { cat: 'Languages', items: ['Java', 'PHP', 'Octave'] },
+  { cat: 'Frameworks & Libraries', items: ['Spring', 'Hibernate', 'React', 'React Native', 'Streamlit'] },
+  { cat: 'Databases', items: ['Postgres', 'MySQL', 'SQLite', 'Supabase'] },
+  { cat: 'DevOps & Cloud', items: ['Git', 'GitHub', 'GitLab', 'GitHub Actions', 'Docker', 'AWS', 'Azure', 'Vercel', 'Netlify'] },
+  { cat: 'Tools & Environments', items: ['Windows Terminal', 'Bash Script', 'Apache Maven', 'Apache Tomcat', 'Vite', 'Postman'] },
+  { cat: 'Design', items: ['Figma', 'Canva', 'Adobe Illustrator'] },
+];
+
+/* ═══════════════════════════
+   STATE
+═══════════════════════════ */
+let activeWindowId = null;
+let activeDockId = null;
+let terminalDone = false;
+let _winZ = 120;
 let resumeRendered = false;
+let notesInited = false;
+let contactsRendered = false;
+let projectsRendered = false;
+let kaboomInst = null;
+
+/* ═══════════════════════════
+   CANVAS: STARS
+═══════════════════════════ */
+(function initStars() {
+  const canvas = document.getElementById('bgCanvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    stars = Array.from({ length: 160 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.2,
+      a: Math.random() * 0.6 + 0.1,
+      speed: Math.random() * 0.3 + 0.1,
+      phase: Math.random() * Math.PI * 2,
+    }));
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const a = s.a * (0.6 + 0.4 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(ts => draw(ts / 1000));
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw(0);
+})();
+
+/* ═══════════════════════════
+   CLOCK
+═══════════════════════════ */
+function tick() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = (h % 12) || 12;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const mos = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const el = document.getElementById('menuClock');
+  if (el) el.textContent = `${days[now.getDay()]} ${mos[now.getMonth()]} ${now.getDate()}  ${h12}:${m} ${ampm}`;
+}
+tick();
+setInterval(tick, 1000);
+
+/* ═══════════════════════════
+   WINDOW MANAGEMENT
+═══════════════════════════ */
+const DOCK_MAP = {
+  projectsWindow: 'dockFinder',
+  aboutWindow: 'dockSafari',
+  skillsWindow: 'dockTerminal',
+  experienceWindow: 'dockNotes',
+  contactWindow: 'dockMail',
+  resumeWindow: 'dockPreview',
+  arcadeWindow: 'dockArcade',
+};
+
+function bringToFront(winEl) {
+  _winZ++;
+  winEl.style.zIndex = _winZ;
+}
+
+function openWindow(winId, dockId) {
+  const winEl = document.getElementById(winId);
+  const dockEl = dockId ? document.getElementById(dockId) : null;
+  if (!winEl) return;
+
+  if (winEl.classList.contains('active')) {
+    winEl.classList.remove('active');
+    dockEl?.classList.remove('running');
+    return;
+  }
+
+  document.getElementById('welcomeWindow')?.classList.remove('active');
+
+  if (isMobileView()) {
+    resetWindowPosition(winEl);
+  }
+
+  winEl.classList.add('active');
+  dockEl?.classList.add('running');
+
+  activeWindowId = winId;
+  activeDockId = dockId || null;
+  bringToFront(winEl);
+
+  if (winId === 'projectsWindow') renderProjects();
+  if (winId === 'experienceWindow') renderExperience();
+  if (winId === 'contactWindow') renderContacts();
+  if (winId === 'resumeWindow' && !resumeRendered) renderResume();
+  if (winId === 'ideasWindow') renderBuildLab();
+  if (winId === 'nowWindow') renderNow();
+  if (winId === 'skillsWindow' && !terminalDone) setTimeout(animateTerminal, 180);
+  if (winId === 'arcadeWindow') setTimeout(initPlatformerGame, 80);
+}
+
+function closeWindow(winId) {
+  const winEl = document.getElementById(winId);
+  if (!winEl) return;
+
+  winEl.classList.remove('active');
+
+  const dId = DOCK_MAP[winId] || activeDockId;
+  if (dId) document.getElementById(dId)?.classList.remove('running');
+
+  if (activeWindowId === winId) {
+    activeWindowId = null;
+    activeDockId = null;
+  }
+}
+
+/* ═══════════════════════════
+   RENDER: PROJECTS
+═══════════════════════════ */
+function renderProjects() {
+  if (projectsRendered) return;
+  projectsRendered = true;
+
+  const grid = document.getElementById('projectsGrid');
+  if (!grid) return;
+
+  PROJECTS.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.dataset.cat = p.cat;
+    card.dataset.index = i;
+    card.innerHTML = `
+      <div class="pc-title">${p.title}</div>
+      <p class="pc-desc">${p.desc}</p>
+      <div class="pc-stack">${p.stack.map(s => `<span class="stack-pill">${s}</span>`).join('')}</div>
+      <div class="pc-links">
+        <a class="pc-link gh" href="${p.github}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="pc-link lv" href="${p.demo}" target="_blank" rel="noopener noreferrer">Live</a>
+      </div>
+    `;
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(14px)';
+    grid.appendChild(card);
+
+    setTimeout(() => {
+      card.style.transition = 'opacity .35s ease, transform .35s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, i * 65);
+  });
+
+  let currentCategory = 'all';
+  let selectedTags = [];
+
+  function updateFiltering() {
+    const projectCards = document.querySelectorAll('.project-card');
+
+    projectCards.forEach(card => {
+      const cardCat = card.dataset.cat;
+      const projectData = PROJECTS[card.dataset.index];
+
+      const matchCat = currentCategory === 'all' || cardCat === currentCategory;
+      const matchTags = selectedTags.length === 0 || selectedTags.every(t => projectData.stack.includes(t));
+      const shouldShow = matchCat && matchTags;
+
+      if (shouldShow) {
+        card.style.display = '';
+        requestAnimationFrame(() => card.classList.remove('hidden'));
+      } else {
+        card.classList.add('hidden');
+        setTimeout(() => {
+          if (card.classList.contains('hidden')) card.style.display = 'none';
+        }, 300);
+      }
+    });
+  }
+
+  document.querySelectorAll('.sidebar-item[data-filter]').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      currentCategory = el.dataset.filter;
+
+      if (currentCategory === 'all') {
+        selectedTags = [];
+        document.querySelectorAll('.sidebar-tag').forEach(t => t.classList.remove('active'));
+      }
+
+      updateFiltering();
+    });
+  });
+
+  document.querySelectorAll('.sidebar-tag[data-tag]').forEach(el => {
+    el.addEventListener('click', () => {
+      const tag = el.dataset.tag;
+      if (selectedTags.includes(tag)) {
+        selectedTags = selectedTags.filter(t => t !== tag);
+        el.classList.remove('active');
+      } else {
+        selectedTags.push(tag);
+        el.classList.add('active');
+      }
+      updateFiltering();
+    });
+  });
+}
+
+/* ═══════════════════════════
+   VIEW TOGGLE
+═══════════════════════════ */
+function setProjectView(mode) {
+  const grid = document.getElementById('projectsGrid');
+  if (!grid) return;
+  grid.classList.toggle('list-view', mode === 'list');
+  document.getElementById('viewGrid')?.classList.toggle('active', mode === 'grid');
+  document.getElementById('viewList')?.classList.toggle('active', mode === 'list');
+}
+
+/* ═══════════════════════════
+   RENDER: EXPERIENCE
+═══════════════════════════ */
+function renderExperience() {
+  if (notesInited) return;
+  notesInited = true;
+
+  const tabs = document.querySelectorAll('.notes-list-item[data-tab]');
+  tabs.forEach(tabEl => {
+    tabEl.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tabEl.classList.add('active');
+      renderNotesContent(tabEl.dataset.tab);
+    });
+  });
+
+  renderNotesContent('certificates');
+}
+
+function renderNotesContent(tab) {
+  const container = document.getElementById('expTimeline');
+  const titleEl = document.querySelector('.notes-title');
+  const dateEl = document.querySelector('.notes-date');
+  if (!container || !titleEl || !dateEl) return;
+
+  container.innerHTML = '';
+  container.parentElement.scrollTop = 0;
+
+  let content = [];
+  let title = '';
+  let countText = '';
+
+  if (tab === 'certificates') {
+    title = 'Certificates';
+    content = CERTIFICATES;
+    countText = `Updated March 2026 · ${CERTIFICATES.length} items`;
+  } else if (tab === 'education') {
+    title = 'Education';
+    countText = `Updated March 2026 · 1 item`;
+    const edu = EDUCATION;
+    const el = document.createElement('div');
+    el.className = 'edu-content';
+    el.innerHTML = `
+      <div class="edu-header">
+        <div class="edu-institution">${edu.institution}</div>
+        <div class="edu-degree">${edu.degree} · ${edu.date}</div>
+        <div class="edu-gpa">GPA: ${edu.gpa}</div>
+      </div>
+      <p class="edu-desc">${edu.desc}</p>
+      <div class="edu-highlights">
+        <div class="edu-h-title">Highlights:</div>
+        <ul>${edu.highlights.map(h => `<li>${h}</li>`).join('')}</ul>
+      </div>
+    `;
+    applyNoteAnimation(el, 0);
+    container.appendChild(el);
+  } else if (tab === 'achievements') {
+    title = 'Achievements';
+    content = ACHIEVEMENTS;
+    countText = `Updated March 2026 · ${ACHIEVEMENTS.length} items`;
+  }
+
+  titleEl.textContent = title;
+  dateEl.textContent = countText;
+
+  if (tab !== 'education') {
+    content.forEach((item, i) => {
+      const el = document.createElement('div');
+      el.className = 'note-item';
+      el.innerHTML = `
+        <div class="note-item-header">
+          <div class="note-item-title">${item.title}</div>
+          ${item.date ? `<div class="note-item-date">${item.date}</div>` : ''}
+        </div>
+        ${item.org ? `<div class="note-item-org">${item.org}</div>` : ''}
+        <p class="note-item-desc">${item.desc}</p>
+      `;
+      applyNoteAnimation(el, i);
+      container.appendChild(el);
+    });
+  }
+}
+
+function applyNoteAnimation(el, index) {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(10px)';
+  el.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+  setTimeout(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  }, index * 60 + 20);
+}
+
+/* ═══════════════════════════
+   RENDER: CONTACTS
+═══════════════════════════ */
+function renderContacts() {
+  if (contactsRendered) return;
+  contactsRendered = true;
+
+  const container = document.getElementById('mailLinks');
+  if (!container) return;
+
+  CONTACTS.forEach((c, i) => {
+    const a = document.createElement('a');
+    a.className = 'mail-link-item' + (i === 0 ? ' active' : '');
+    a.href = c.href;
+    a.target = '_blank';
+    a.rel = 'noopener';
+
+    a.innerHTML = `
+      <div class="mli-icon" style="background:${c.bg}">
+        <img src="${c.icon}" alt="${c.label}" style="width:100%;height:100%;object-fit:contain;border-radius:6px;display:block;" />
+      </div>
+      <div class="mli-info"><strong>${c.label}</strong><span>${c.value}</span></div>
+      <span class="mli-arr">›</span>
+    `;
+
+    a.addEventListener('mousedown', () => {
+      container.querySelectorAll('.mail-link-item').forEach(el => el.classList.remove('active'));
+      a.classList.add('active');
+    });
+
+    container.appendChild(a);
+  });
+}
+
+/* ═══════════════════════════
+   RESUME
+═══════════════════════════ */
 function renderResume() {
   const container = document.getElementById('resumeContent');
   if (!container) return;
@@ -269,34 +727,18 @@ function renderResume() {
       `).join('')}
     </section>
   `;
+
+  resumeRendered = true;
 }
 
-const NOW_STATUS = [
-  {
-    title: "Building",
-    color: "green",
-    desc: "Developing a production-ready Spring Boot microservices system with JWT authentication, Redis session management, and Docker deployment.",
-    tags: ["Spring Boot", "Redis", "JWT", "Docker"]
-  },
-  {
-    title: "Learning",
-    color: "purple",
-    desc: "Deep dive into system design concepts including distributed systems, consistent hashing, CAP theorem, and advanced Java concurrency patterns.",
-    tags: ["System Design", "Distributed Systems", "Java Concurrency"]
-  },
-  {
-    title: "Focus",
-    color: "blue",
-    desc: "Targeting backend-focused internship opportunities where I can build scalable systems and work on developer tools or fintech infrastructure.",
-    tags: ["Backend", "Microservices", "Fintech"]
-  }
-];
-
+/* ═══════════════════════════
+   NOW
+═══════════════════════════ */
 function renderNow() {
   const container = document.getElementById('nowStatusGrid');
   if (!container) return;
-  container.innerHTML = '';
 
+  container.innerHTML = '';
   const now = new Date();
   const timeStr = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
   const timeEl = document.getElementById('nowUpdateTime');
@@ -306,7 +748,7 @@ function renderNow() {
     const card = document.createElement('div');
     card.className = `status-card status-${status.color}`;
     card.style.setProperty('--delay', `${i * 0.12}s`);
-    
+
     card.innerHTML = `
       <div class="status-card-header">
         <div class="status-orb"></div>
@@ -321,61 +763,20 @@ function renderNow() {
   });
 }
 
-const BUILD_LAB = [
-  {
-    title: "Dev Tools Dashboard",
-    cat: "SaaS",
-    status: "Planning",
-    desc: "Unified dashboard for developers combining GitHub activity, CI/CD status, and deployment logs.",
-    link: "https://github.com/features/actions"
-  },
-  {
-    title: "Spring Boot Starter Kit",
-    cat: "Open Source",
-    status: "Idea",
-    desc: "Pre-configured Spring Boot template with authentication, logging, rate limiting, and Docker setup.",
-    link: "https://spring.io/projects/spring-boot"
-  },
-  {
-    title: "Code Snippet Manager",
-    cat: "Productivity",
-    status: "Exploring",
-    desc: "A searchable snippet vault with tagging, editor integrations, and local-first storage.",
-    link: "https://www.raycast.com/extensions/snippets"
-  },
-  {
-    title: "PR Review Assistant",
-    cat: "AI",
-    status: "Planning",
-    desc: "Tool that analyzes pull requests for code quality, performance issues, and security risks using AI.",
-    link: "https://github.com/features/code-review"
-  },
-  {
-    title: "API Diffing Tool",
-    cat: "Dev Tool",
-    status: "Idea",
-    desc: "Compare API versions and generate changelogs with breaking changes highlighted automatically.",
-    link: "https://swagger.io/tools/swagger-diff/"
-  },
-  {
-    title: "Developer Portfolio OS",
-    cat: "Community",
-    status: "Exploring",
-    desc: "A customizable system for building interactive, OS-style developer portfolios.",
-    link: "https://github.com/topics/portfolio"
-  }
-];
-
+/* ═══════════════════════════
+   BUILD LAB
+═══════════════════════════ */
 function renderBuildLab() {
   const container = document.getElementById('buildLabGrid');
   if (!container) return;
+
   container.innerHTML = '';
 
   BUILD_LAB.forEach((item, i) => {
     const card = document.createElement('div');
     card.className = 'lab-card';
     card.style.setProperty('--delay', `${i * 0.1}s`);
-    
+
     card.innerHTML = `
       <div class="lab-card-top">
         <span class="lab-cat">${item.cat}</span>
@@ -384,398 +785,10 @@ function renderBuildLab() {
       <h3 class="lab-title">${item.title}</h3>
       <p class="lab-desc">${item.desc}</p>
       <div class="lab-footer">
-        <a href="${item.link}" target="_blank" class="lab-link-btn" rel="noopener">
-          Reference
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:4px">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
-          </svg>
-        </a>
+        <a href="${item.link}" target="_blank" class="lab-link-btn" rel="noopener">Reference</a>
       </div>
     `;
     container.appendChild(card);
-  });
-}
-
-const SKILLS = [
-  { cat: 'Languages', items: ['Java', 'PHP', 'Octave'] },
-  { cat: 'Frameworks & Libraries', items: ['Spring', 'Hibernate', 'React', 'React Native', 'Streamlit'] },
-  { cat: 'Databases', items: ['Postgres', 'MySQL', 'SQLite', 'Supabase'] },
-  { cat: 'DevOps & Cloud', items: ['Git', 'GitHub', 'GitLab', 'GitHub Actions', 'Docker', 'AWS', 'Azure', 'Vercel', 'Netlify'] },
-  { cat: 'Tools & Environments', items: ['Windows Terminal', 'Bash Script', 'Apache Maven', 'Apache Tomcat', 'Vite', 'Postman'] },
-  { cat: 'Design', items: ['Figma', 'Canva', 'Adobe Illustrator'] },
-];
-
-/* ═══════════════════════════
-   STATE
-═══════════════════════════ */
-let activeWindowId = null;
-let activeDockId = null;
-let terminalDone = false;
-let _winZ = 120; // z-index counter for window stacking
-
-// Initialize EmailJS with your Public Key
-// (function() { emailjs.init("YOUR_PUBLIC_KEY"); })();
-
-
-/* ═══════════════════════════
-   CANVAS: STARS
-═══════════════════════════ */
-(function initStars() {
-  const canvas = document.getElementById('bgCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let stars = [];
-
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    stars = Array.from({ length: 160 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.2 + 0.2,
-      a: Math.random() * .6 + .1,
-      speed: Math.random() * .3 + .1,
-      phase: Math.random() * Math.PI * 2,
-    }));
-  }
-
-  function draw(t) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    stars.forEach(s => {
-      const a = s.a * (.6 + .4 * Math.sin(t * s.speed + s.phase));
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${a})`;
-      ctx.fill();
-    });
-    requestAnimationFrame(ts => draw(ts / 1000));
-  }
-
-  window.addEventListener('resize', resize);
-  resize();
-  draw(0);
-})();
-
-/* ═══════════════════════════
-   CLOCK
-═══════════════════════════ */
-function tick() {
-  const now = new Date();
-  const h = now.getHours(), m = now.getMinutes().toString().padStart(2, '0');
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = (h % 12) || 12;
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const mos = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const el = document.getElementById('menuClock');
-  if (el) el.textContent = `${days[now.getDay()]} ${mos[now.getMonth()]} ${now.getDate()}  ${h12}:${m} ${ampm}`;
-}
-tick();
-setInterval(tick, 1000);
-
-/* ═══════════════════════════
-   WINDOW MANAGEMENT
-═══════════════════════════ */
-/* dock → window id map (for closeWindow pip sync) */
-const DOCK_MAP = {
-  projectsWindow: 'dockFinder',
-  aboutWindow: 'dockSafari',
-  skillsWindow: 'dockTerminal',
-  experienceWindow: 'dockNotes',
-  contactWindow: 'dockMail',
-  resumeWindow: 'dockPreview',
-  arcadeWindow: 'dockArcade',
-};
-
-function bringToFront(winEl) {
-  _winZ++;
-  winEl.style.zIndex = _winZ;
-}
-
-function openWindow(winId, dockId) {
-  const winEl = document.getElementById(winId);
-  const dockEl = document.getElementById(dockId);
-  if (!winEl) return;
-
-  // Toggle off if already visible
-  if (winEl.classList.contains('active')) {
-    winEl.classList.remove('active');
-    dockEl?.classList.remove('running');
-    return;
-  }
-
-  // Hide welcome
-  document.getElementById('welcomeWindow')?.classList.remove('active');
-
-  // Open (leave other windows open — multi-window)
-  winEl.classList.add('active');
-  dockEl?.classList.add('running');
-  activeWindowId = winId;
-  activeDockId = dockId;
-  bringToFront(winEl);
-
-  // Section inits
-  if (winId === 'projectsWindow') renderProjects();
-  if (winId === 'experienceWindow') renderExperience();
-  if (winId === 'contactWindow') renderContacts();
-  if (winId === 'resumeWindow') renderResume();
-  if (winId === 'ideasWindow') renderBuildLab();
-  if (winId === 'nowWindow') renderNow();
-  if (winId === 'skillsWindow' && !terminalDone) setTimeout(animateTerminal, 180);
-  if (winId === 'arcadeWindow') setTimeout(initPlatformerGame, 80);
-}
-
-function closeWindow(winId) {
-  document.getElementById(winId)?.classList.remove('active');
-  const dId = DOCK_MAP[winId] || activeDockId;
-  document.getElementById(dId)?.classList.remove('running');
-  if (activeWindowId === winId) activeWindowId = activeDockId = null;
-}
-
-
-function closeWelcome() {
-  document.getElementById('welcomeWindow')?.classList.remove('active');
-}
-
-/* ═══════════════════════════
-   RENDER: PROJECTS
-═══════════════════════════ */
-let projectsRendered = false;
-function renderProjects() {
-  if (projectsRendered) return;
-  projectsRendered = true;
-  const grid = document.getElementById('projectsGrid');
-  if (!grid) return;
-
-  PROJECTS.forEach((p, i) => {
-    const card = document.createElement('div');
-    card.className = 'project-card';
-    card.dataset.cat = p.cat;
-    card.dataset.index = i; // Store index for easier filtering
-    card.innerHTML = `
-      <div class="pc-title">${p.title}</div>
-      <p class="pc-desc">${p.desc}</p>
-      <div class="pc-stack">${p.stack.map(s => `<span class="stack-pill">${s}</span>`).join('')}</div>
-      <div class="pc-links">
-        <a class="pc-link gh" href="${p.github}" target="_blank" rel="noopener noreferrer">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
-        </a>
-        <a class="pc-link lv" href="${p.demo}" target="_blank" rel="noopener noreferrer">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-          Live
-        </a>
-      </div>`;
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(14px)';
-    grid.appendChild(card);
-    setTimeout(() => {
-      card.style.transition = 'opacity .35s ease, transform .35s ease';
-      card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
-    }, i * 65);
-  });
-
-  // Filter state
-  let currentCategory = 'all';
-  let selectedTags = [];
-
-  function updateFiltering() {
-    const projectCards = document.querySelectorAll('.project-card');
-
-    projectCards.forEach(card => {
-      const cardCat = card.dataset.cat;
-      const projectData = PROJECTS[card.dataset.index];
-
-      const matchCat = currentCategory === 'all' || cardCat === currentCategory;
-      const matchTags = selectedTags.length === 0 || selectedTags.every(t => projectData.stack.includes(t));
-
-      const shouldShow = matchCat && matchTags;
-
-      if (shouldShow) {
-        const wasHidden = card.classList.contains('hidden') || card.style.display === 'none';
-        if (wasHidden) {
-          card.style.display = '';
-          // Force layout for animation
-          card.getBoundingClientRect();
-          card.classList.remove('hidden');
-        }
-      } else {
-        if (!card.classList.contains('hidden')) {
-          card.classList.add('hidden');
-          // Wait for transition before display: none
-          setTimeout(() => {
-            if (card.classList.contains('hidden')) {
-              card.style.display = 'none';
-            }
-          }, 300);
-        }
-      }
-    });
-  }
-
-  // sidebar category filter
-  document.querySelectorAll('.sidebar-item[data-filter]').forEach(el => {
-    el.addEventListener('click', () => {
-      document.querySelectorAll('.sidebar-item').forEach(x => x.classList.remove('active'));
-      el.classList.add('active');
-      currentCategory = el.dataset.filter;
-
-      // If "All Projects" (all) is clicked, also reset tags
-      if (currentCategory === 'all') {
-        selectedTags = [];
-        document.querySelectorAll('.sidebar-tag').forEach(t => t.classList.remove('active'));
-      }
-
-      updateFiltering();
-    });
-  });
-
-  // sidebar tag filter
-  document.querySelectorAll('.sidebar-tag[data-tag]').forEach(el => {
-    el.addEventListener('click', () => {
-      const tag = el.dataset.tag;
-      if (selectedTags.includes(tag)) {
-        selectedTags = selectedTags.filter(t => t !== tag);
-        el.classList.remove('active');
-      } else {
-        selectedTags.push(tag);
-        el.classList.add('active');
-      }
-      updateFiltering();
-    });
-  });
-}
-
-/* ═══════════════════════════
-   VIEW TOGGLE
-═══════════════════════════ */
-function setProjectView(mode) {
-  const grid = document.getElementById('projectsGrid');
-  if (!grid) return;
-  grid.classList.toggle('list-view', mode === 'list');
-  document.getElementById('viewGrid')?.classList.toggle('active', mode === 'grid');
-  document.getElementById('viewList')?.classList.toggle('active', mode === 'list');
-}
-
-/* ═══════════════════════════
-   RENDER: EXPERIENCE
-═══════════════════════════ */
-let notesInited = false;
-function renderExperience() {
-  if (notesInited) return;
-  notesInited = true;
-
-  const tabs = document.querySelectorAll('.notes-list-item[data-tab]');
-  tabs.forEach(tabEl => {
-    tabEl.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tabEl.classList.add('active');
-      renderNotesContent(tabEl.dataset.tab);
-    });
-  });
-
-  // Default tab
-  renderNotesContent('certificates');
-}
-
-function renderNotesContent(tab) {
-  const container = document.getElementById('expTimeline');
-  const titleEl = document.querySelector('.notes-title');
-  const dateEl = document.querySelector('.notes-date');
-  if (!container || !titleEl || !dateEl) return;
-
-  container.innerHTML = '';
-  container.parentElement.scrollTop = 0;
-
-  let content = [];
-  let title = '';
-  let countText = '';
-
-  if (tab === 'certificates') {
-    title = 'Certificates';
-    content = CERTIFICATES;
-    countText = `Updated March 2026 · ${CERTIFICATES.length} items`;
-  } else if (tab === 'education') {
-    title = 'Education';
-    countText = `Updated March 2026 · 1 item`;
-    const edu = EDUCATION;
-    const el = document.createElement('div');
-    el.className = 'edu-content';
-    el.innerHTML = `
-      <div class="edu-header">
-        <div class="edu-institution">${edu.institution}</div>
-        <div class="edu-degree">${edu.degree} · ${edu.date}</div>
-        <div class="edu-gpa">GPA: ${edu.gpa}</div>
-      </div>
-      <p class="edu-desc">${edu.desc}</p>
-      <div class="edu-highlights">
-        <div class="edu-h-title">Highlights:</div>
-        <ul>${edu.highlights.map(h => `<li>${h}</li>`).join('')}</ul>
-      </div>`;
-    applyNoteAnimation(el, 0);
-    container.appendChild(el);
-  } else if (tab === 'achievements') {
-    title = 'Achievements';
-    content = ACHIEVEMENTS;
-    countText = `Updated March 2026 · ${ACHIEVEMENTS.length} items`;
-  }
-
-  titleEl.textContent = title;
-  dateEl.textContent = countText;
-
-  if (tab !== 'education') {
-    content.forEach((item, i) => {
-      const el = document.createElement('div');
-      el.className = 'note-item';
-      el.innerHTML = `
-        <div class="note-item-header">
-          <div class="note-item-title">${item.title}</div>
-          ${item.date ? `<div class="note-item-date">${item.date}</div>` : ''}
-        </div>
-        ${item.org ? `<div class="note-item-org">${item.org}</div>` : ''}
-        <p class="note-item-desc">${item.desc}</p>`;
-      applyNoteAnimation(el, i);
-      container.appendChild(el);
-    });
-  }
-}
-
-function applyNoteAnimation(el, index) {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(10px)';
-  el.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
-  setTimeout(() => {
-    el.style.opacity = '1';
-    el.style.transform = 'translateY(0)';
-  }, index * 60 + 20);
-}
-
-/* ═══════════════════════════
-   RENDER: CONTACTS
-═══════════════════════════ */
-let contactsRendered = false;
-function renderContacts() {
-  if (contactsRendered) return;
-  contactsRendered = true;
-  const container = document.getElementById('mailLinks');
-  if (!container) return;
-  CONTACTS.forEach((c, i) => {
-    const a = document.createElement('a');
-    a.className = 'mail-link-item' + (i === 0 ? ' active' : '');
-    a.href = c.href;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.innerHTML = `
-      <div class="mli-icon" style="background:${c.bg}">
-        <img src="${c.icon}" alt="${c.label}" style="width:100%;height:100%;object-fit:contain;border-radius:6px;display:block;" />
-      </div>
-      <div class="mli-info"><strong>${c.label}</strong><span>${c.value}</span></div>
-      <span class="mli-arr">›</span>`;
-    a.addEventListener('mousedown', () => {
-      container.querySelectorAll('.mail-link-item').forEach(el => el.classList.remove('active'));
-      a.classList.add('active');
-    });
-    container.appendChild(a);
   });
 }
 
@@ -786,8 +799,8 @@ async function animateTerminal() {
   terminalDone = true;
   const out = document.getElementById('terminalOutput');
   if (!out) return;
-  const wait = ms => new Promise(r => setTimeout(r, ms));
 
+  const wait = ms => new Promise(r => setTimeout(r, ms));
   const addLine = (cls, text) => {
     const row = document.createElement('div');
     row.className = 'tl-row';
@@ -838,7 +851,6 @@ async function sendMail() {
     return;
   }
 
-  // Basic email validation
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showToast('Please enter a valid email address.');
     return;
@@ -849,13 +861,11 @@ async function sendMail() {
     btn.style.opacity = '0.5';
     showToast('Sending message...');
 
-    // We use Web3Forms (https://web3forms.com/) - Simple, free, no backend.
-    // Replace 'YOUR_ACCESS_KEY_HERE' with the key you get from their website.
     const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        access_key: "6f7eccc1-21d7-4c3d-b700-90dba0b66da7",
+        access_key: "YOUR_WEB3FORMS_ACCESS_KEY",
         from_name: email,
         subject: subject,
         message: message
@@ -866,14 +876,12 @@ async function sendMail() {
 
     if (result.success) {
       showToast('Message sent successfully!');
-      // Clear form
       document.getElementById('contactEmail').value = '';
       document.getElementById('contactSubject').value = '';
       document.getElementById('contactMessage').value = '';
     } else {
       showToast('Error: ' + result.message);
     }
-
   } catch (err) {
     console.error("Form Error:", err);
     showToast('Connection error. Try again.');
@@ -883,18 +891,24 @@ async function sendMail() {
   }
 }
 
+/* ═══════════════════════════
+   RESUME DOWNLOAD
+═══════════════════════════ */
 function downloadResume() {
   const resume = document.getElementById('resumeContent');
   if (!resume) return;
-  
+
   showToast('Preparing document…');
-  
+
   const printWin = window.open('', '_blank');
   const styles = Array.from(document.styleSheets)
     .filter(s => !s.href || s.href.includes(window.location.origin))
     .map(s => {
-      try { return Array.from(s.cssRules).map(r => r.cssText).join(''); }
-      catch(e) { return ''; }
+      try {
+        return Array.from(s.cssRules).map(r => r.cssText).join('');
+      } catch (e) {
+        return '';
+      }
     }).join('');
 
   printWin.document.write(`
@@ -910,16 +924,8 @@ function downloadResume() {
       </head>
       <body>
         <div class="cv-page" id="resumeContent">${resume.innerHTML}</div>
-        <style>
-          #resumeContent { visibility: visible !important; transform: none !important; }
-          #resumeContent * { visibility: visible !important; }
-        </style>
         <script>
-          window.onload = () => {
-            setTimeout(() => {
-              window.print();
-            }, 500);
-          };
+          window.onload = () => setTimeout(() => window.print(), 500);
         </script>
       </body>
     </html>
@@ -948,12 +954,18 @@ function initDockMagnification() {
   if (!dock || !items) return;
 
   dock.addEventListener('mousemove', e => {
+    if (isMobileView()) {
+      items.forEach(item => item.style.transform = '');
+      return;
+    }
+
     const mx = e.clientX;
     items.forEach(item => {
       const rect = item.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const dist = Math.abs(mx - cx);
       const max = 130;
+
       if (dist < max) {
         const t = 1 - dist / max;
         item.style.transform = `translateY(-${t * 18}px) scale(${1 + t * 0.45})`;
@@ -964,7 +976,7 @@ function initDockMagnification() {
   });
 
   dock.addEventListener('mouseleave', () => {
-    items.forEach(item => { item.style.transform = ''; });
+    items.forEach(item => item.style.transform = '');
   });
 }
 
@@ -976,6 +988,7 @@ document.addEventListener('keydown', e => {
     closeWindow(activeWindowId);
     return;
   }
+
   const MAP = {
     '1': ['projectsWindow', 'dockFinder'],
     '2': ['aboutWindow', 'dockSafari'],
@@ -984,6 +997,7 @@ document.addEventListener('keydown', e => {
     '5': ['contactWindow', 'dockMail'],
     '6': ['resumeWindow', 'dockPreview'],
   };
+
   if ((e.metaKey || e.ctrlKey) && MAP[e.key]) {
     e.preventDefault();
     openWindow(...MAP[e.key]);
@@ -995,9 +1009,11 @@ document.addEventListener('keydown', e => {
 ═══════════════════════════ */
 function initParallax() {
   document.addEventListener('mousemove', e => {
-    const nx = (e.clientX / window.innerWidth - .5) * 2;
-    const ny = (e.clientY / window.innerHeight - .5) * 2;
+    if (isMobileView()) return;
+    const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+    const ny = (e.clientY / window.innerHeight - 0.5) * 2;
     const orbs = document.querySelectorAll('.orb');
+
     orbs.forEach((orb, i) => {
       const factor = (i + 1) * 8;
       orb.style.transform = `translate(${nx * factor}px, ${ny * factor}px)`;
@@ -1006,46 +1022,56 @@ function initParallax() {
 }
 
 /* ═══════════════════════════
-   DESKTOP FOLDERS (with drag)
+   DESKTOP FOLDERS
 ═══════════════════════════ */
 function initFolders() {
   const desktop = document.getElementById('desktop');
   const folders = document.querySelectorAll('.folder-item');
   let folderDrag = null;
-  let lastClicked = null;
 
-  // ── Position folders (match old flex column layout) ──
-  const GAP = 6, ITEM_H = 90;
-  folders.forEach((f, i) => {
-    f.style.left = '16px';
-    f.style.top = (12 + i * (ITEM_H + GAP)) + 'px';
-  });
+  const GAP = 6;
+  const ITEM_H = 90;
+
+  function positionFolders() {
+    if (isMobileView()) return;
+    folders.forEach((f, i) => {
+      f.style.left = '16px';
+      f.style.top = (12 + i * (ITEM_H + GAP)) + 'px';
+    });
+  }
+
+  positionFolders();
 
   folders.forEach(folder => {
-    // ── Mousedown: start potential drag ──
     folder.addEventListener('mousedown', e => {
+      if (isMobileView()) return;
       if (e.button !== 0) return;
       e.stopPropagation();
+
       const desk = desktop.getBoundingClientRect();
       const fRect = folder.getBoundingClientRect();
+
       folderDrag = {
         el: folder,
-        mx: e.clientX, my: e.clientY,
+        mx: e.clientX,
+        my: e.clientY,
         ox: fRect.left - desk.left,
         oy: fRect.top - desk.top,
         moved: false,
       };
     });
 
-    // ── Click: select ──
     folder.addEventListener('click', e => {
-      if (folder._dragged) { folder._dragged = false; return; }
+      if (folder._dragged) {
+        folder._dragged = false;
+        return;
+      }
+
       e.stopPropagation();
       folders.forEach(f => f.classList.remove('selected'));
       folder.classList.add('selected');
     });
 
-    // ── Dblclick: open window ──
     folder.addEventListener('dblclick', e => {
       if (folder._dragged) return;
       e.stopPropagation();
@@ -1057,36 +1083,39 @@ function initFolders() {
       showToast(`Opening ${folder.querySelector('.folder-label').textContent}…`, 1800);
     });
 
-    // ── Keyboard ──
     folder.addEventListener('keydown', e => {
       if (e.key === 'Enter') folder.dispatchEvent(new MouseEvent('dblclick'));
-      else if (e.key === ' ') { e.preventDefault(); folder.dispatchEvent(new MouseEvent('click')); }
+      if (e.key === ' ') {
+        e.preventDefault();
+        folder.dispatchEvent(new MouseEvent('click'));
+      }
     });
   });
 
-  // ── Global folder mousemove ──
   document.addEventListener('mousemove', e => {
-    if (!folderDrag) return;
+    if (!folderDrag || isMobileView()) return;
+
     const dx = e.clientX - folderDrag.mx;
     const dy = e.clientY - folderDrag.my;
+
     if (!folderDrag.moved && Math.hypot(dx, dy) < 5) return;
+
     if (!folderDrag.moved) {
       folderDrag.moved = true;
       folderDrag.el.classList.add('folder-dragging');
     }
+
     const desk = desktop.getBoundingClientRect();
     const fw = folderDrag.el.offsetWidth;
     const fh = folderDrag.el.offsetHeight;
-    
-    // Calculate new position based on delta
+
     const nl = Math.max(0, Math.min(desk.width - fw, folderDrag.ox + dx));
     const nt = Math.max(0, Math.min(desk.height - fh - 10, folderDrag.oy + dy));
-    
+
     folderDrag.el.style.left = nl + 'px';
     folderDrag.el.style.top = nt + 'px';
   });
 
-  // ── Global folder mouseup ──
   document.addEventListener('mouseup', () => {
     if (!folderDrag) return;
     folderDrag.el.classList.remove('folder-dragging');
@@ -1097,9 +1126,19 @@ function initFolders() {
     folderDrag = null;
   });
 
-  // ── Desktop click deselects ──
   desktop?.addEventListener('click', () => {
     folders.forEach(f => f.classList.remove('selected'));
+  });
+
+  window.addEventListener('resize', () => {
+    if (isMobileView()) {
+      folders.forEach(f => {
+        f.style.left = '';
+        f.style.top = '';
+      });
+    } else {
+      positionFolders();
+    }
   });
 }
 
@@ -1111,9 +1150,7 @@ function initDraggableWindows() {
   let winDrag = null;
 
   document.querySelectorAll('.window').forEach(win => {
-    // Clicking any part of win brings it to front
     win.addEventListener('mousedown', () => {
-      // Only bring center if not already the highest to avoid link-click interference in some browsers
       if (parseInt(win.style.zIndex || 0) < _winZ) bringToFront(win);
     }, true);
 
@@ -1121,13 +1158,13 @@ function initDraggableWindows() {
     if (!chrome) return;
 
     chrome.addEventListener('mousedown', e => {
+      if (isMobileView()) return;
       if (e.button !== 0) return;
-      if (e.target.closest('.traffic-lights')) return; // don't drag from buttons
+      if (e.target.closest('.traffic-lights')) return;
       e.preventDefault();
 
       bringToFront(win);
 
-      // If window hasn't been manually positioned yet, compute real px coords
       if (!win.classList.contains('win-positioned')) {
         const dr = desktop.getBoundingClientRect();
         const wr = win.getBoundingClientRect();
@@ -1141,9 +1178,11 @@ function initDraggableWindows() {
 
       const dr = desktop.getBoundingClientRect();
       const wr = win.getBoundingClientRect();
+
       winDrag = {
         win,
-        mx: e.clientX, my: e.clientY,
+        mx: e.clientX,
+        my: e.clientY,
         ox: wr.left - dr.left,
         oy: wr.top - dr.top,
       };
@@ -1151,16 +1190,18 @@ function initDraggableWindows() {
   });
 
   document.addEventListener('mousemove', e => {
-    if (!winDrag) return;
+    if (!winDrag || isMobileView()) return;
+
     const { win, mx, my, ox, oy } = winDrag;
     const dr = desktop.getBoundingClientRect();
     const dx = e.clientX - mx;
     const dy = e.clientY - my;
     const CHROME_H = 44;
     const ww = win.offsetWidth;
-    // clamp: always keep title bar reachable
+
     const nl = Math.max(-(ww - 120), Math.min(dr.width - 120, ox + dx));
     const nt = Math.max(0, Math.min(dr.height - CHROME_H, oy + dy));
+
     win.classList.add('win-dragging');
     win.style.left = nl + 'px';
     win.style.top = nt + 'px';
@@ -1171,37 +1212,21 @@ function initDraggableWindows() {
     winDrag.win.classList.remove('win-dragging');
     winDrag = null;
   });
+
+  window.addEventListener('resize', () => {
+    if (!isMobileView()) return;
+    document.querySelectorAll('.window').forEach(resetWindowPosition);
+  });
 }
 
 /* ═══════════════════════════
-   INIT
-═══════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  initDockMagnification();
-  initParallax();
-  initFolders();
-  initDraggableWindows();
-  initClockWidget();
-  initQuoteWidget();
-
-  // Welcome window auto-open disabled successfully
-  /*
-  setTimeout(() => {
-    document.getElementById('welcomeWindow')?.classList.add('active');
-  }, 150);
-  */
-});
-
-
-/* ═══════════════════════════
-   WIDGET — ANALOG CLOCK
+   CLOCK WIDGET
 ═══════════════════════════ */
 function initClockWidget() {
   const canvas = document.getElementById('clockCanvas');
   const dateEl = document.getElementById('widgetDate');
   if (!canvas) return;
 
-  // Hi-DPI support
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const SIZE = 160;
   canvas.width = SIZE * dpr;
@@ -1218,7 +1243,6 @@ function initClockWidget() {
   const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  // Draw a rounded rect via path (broad compat)
   function roundedRect(x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -1235,7 +1259,10 @@ function initClockWidget() {
 
   function hand(angle, length, back, width, color, shadow) {
     ctx.save();
-    if (shadow) { ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 4; }
+    if (shadow) {
+      ctx.shadowColor = 'rgba(0,0,0,.18)';
+      ctx.shadowBlur = 4;
+    }
     ctx.beginPath();
     ctx.moveTo(CX - Math.cos(angle) * back, CY - Math.sin(angle) * back);
     ctx.lineTo(CX + Math.cos(angle) * length, CY + Math.sin(angle) * length);
@@ -1253,17 +1280,14 @@ function initClockWidget() {
     const S = now.getSeconds();
     const MS = now.getMilliseconds();
 
-    // Date label
     if (dateEl) {
       dateEl.textContent = `${DAYS[now.getDay()]}, ${MONTHS[now.getMonth()]} ${now.getDate()}`;
     }
 
     ctx.clearRect(0, 0, SIZE, SIZE);
 
-    // ── Face background ──
     ctx.save();
     roundedRect(2, 2, SIZE - 4, SIZE - 4, 28);
-    // Outer bevel shadow
     ctx.shadowColor = 'rgba(0,0,0,.22)';
     ctx.shadowBlur = 10;
     ctx.shadowOffsetY = 2;
@@ -1274,12 +1298,10 @@ function initClockWidget() {
     ctx.fill();
     ctx.restore();
 
-    // Clip everything inside the face
     ctx.save();
     roundedRect(2, 2, SIZE - 4, SIZE - 4, 28);
     ctx.clip();
 
-    // ── Tick marks ──
     for (let i = 0; i < 60; i++) {
       const a = (i / 60) * Math.PI * 2 - Math.PI / 2;
       const major = i % 5 === 0;
@@ -1294,13 +1316,13 @@ function initClockWidget() {
       ctx.stroke();
     }
 
-    // ── Hour numbers: 12 / 3 / 6 / 9 ──
     const numR = R - 20;
     const fSize = Math.round(SIZE * 0.115);
     ctx.font = `600 ${fSize}px -apple-system, "SF Pro Rounded", Inter, sans-serif`;
     ctx.fillStyle = 'rgba(44,44,52,.88)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+
     [
       { n: '12', a: -Math.PI / 2 },
       { n: '3', a: 0 },
@@ -1310,40 +1332,35 @@ function initClockWidget() {
       ctx.fillText(n, CX + Math.cos(a) * numR, CY + Math.sin(a) * numR);
     });
 
-    // ── Smooth angles ──
     const secA = ((S + MS / 1000) / 60) * Math.PI * 2 - Math.PI / 2;
     const minA = ((M + S / 60) / 60) * Math.PI * 2 - Math.PI / 2;
     const hourA = ((H + M / 60) / 12) * Math.PI * 2 - Math.PI / 2;
 
-    // Hour hand  (short, thick, black)
     hand(hourA, R * 0.50, R * 0.12, 5, 'rgba(28,28,32,.95)', true);
-    // Minute hand (long, medium, black)
     hand(minA, R * 0.72, R * 0.14, 3.5, 'rgba(28,28,32,.90)', true);
-    // Second hand (orange, thin)
     hand(secA, R * 0.80, R * 0.20, 1.6, '#ff9500', false);
 
-    // ── Center cap ──
-    // Orange ring
     ctx.beginPath();
     ctx.arc(CX, CY, 5.5, 0, Math.PI * 2);
     ctx.fillStyle = '#ff9500';
     ctx.fill();
-    // White dot
+
     ctx.beginPath();
     ctx.arc(CX, CY, 2.8, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
     ctx.fill();
 
-    ctx.restore(); // end clip
+    ctx.restore();
   }
 
-  // Animate every frame for smooth second hand sweep
-  (function loop() { draw(); requestAnimationFrame(loop); })();
+  (function loop() {
+    draw();
+    requestAnimationFrame(loop);
+  })();
 }
 
-
 /* ═══════════════════════════
-   WIDGET — DEV QUOTES
+   QUOTE WIDGET
 ═══════════════════════════ */
 const DEV_QUOTES = [
   { text: "It works on my machine.", author: "Every Developer, Ever" },
@@ -1354,21 +1371,13 @@ const DEV_QUOTES = [
   { text: "Any fool can write code a computer can understand. Good programmers write code humans can understand.", author: "Martin Fowler" },
   { text: "There are only two hard things in CS: cache invalidation and naming things.", author: "Phil Karlton" },
   { text: "Premature optimization is the root of all evil.", author: "Donald Knuth" },
-  { text: "The best error message is the one that never shows up.", author: "Thomas Fuchs" },
-  { text: "99 little bugs in the code. Take one down, patch it around… 127 little bugs in the code.", author: "Anonymous" },
-  { text: "Without requirements or design, programming is the art of adding bugs to an empty text file.", author: "Louis Srygley" },
-  { text: "Make it work, make it right, make it fast.", author: "Kent Beck" },
-  { text: "Debugging is twice as hard as writing the code. If you write it as cleverly as possible, you're not smart enough to debug it.", author: "Brian Kernighan" },
-  { text: "Every great developer you know got there by solving problems they were unqualified to solve — until they did it.", author: "Patrick McKenzie" },
-  { text: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
-  { text: "A ship in port is safe, but that's not what ships are built for.", author: "Grace Hopper" },
 ];
 
 function initQuoteWidget() {
   const textEl = document.getElementById('quoteText');
   const authorEl = document.getElementById('quoteAuthor');
   const widget = document.getElementById('quoteWidget');
-  if (!textEl || !widget) return;
+  if (!textEl || !widget || !authorEl) return;
 
   let current = Math.floor(Math.random() * DEV_QUOTES.length);
 
@@ -1392,11 +1401,14 @@ function initQuoteWidget() {
     current = (current + 1) % DEV_QUOTES.length;
     showQuote(DEV_QUOTES[current], true);
   });
+
   widget.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); widget.click(); }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      widget.click();
+    }
   });
 
-  // Auto-rotate every 18s
   setInterval(() => {
     current = (current + 1) % DEV_QUOTES.length;
     showQuote(DEV_QUOTES[current], true);
@@ -1404,25 +1416,20 @@ function initQuoteWidget() {
 }
 
 /* ═══════════════════════════
-   ARCADE: CATCH THE BUG
+   ARCADE
 ═══════════════════════════ */
-
-/* ═══════════════════════════
-   ARCADE: PLATFORMER (Kaboom)
-═══════════════════════════ */
-let kaboomInst = null;
-let currentScore = 0;
-
 function initPlatformerGame() {
   const platScore = document.getElementById('platScore');
   const overlayStart = document.getElementById('platStartScreen');
   const overlayOver = document.getElementById('platGameOver');
-  const platScoreMsg = document.getElementById('platScoreMsg');
   const platEndTitle = document.getElementById('platEndTitle');
   const platEndEmoji = document.getElementById('platEndEmoji');
   const container = document.getElementById('kaboomContainer');
+  const platGameOverSub = document.getElementById('platGameOverSub');
+  const progressBar = document.getElementById('platProgressBar');
 
-  // Bind buttons (remove old listeners by cloning)
+  if (!container || !window.kaboom) return;
+
   ['platStartBtn', 'platReset', 'platPlayAgain', 'platViewProjects'].forEach(id => {
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -1435,52 +1442,38 @@ function initPlatformerGame() {
   const domPlayAgain = document.getElementById('platPlayAgain');
   const domViewProj = document.getElementById('platViewProjects');
 
-    let collectedStacks = [];
+  let collectedStacks = [];
+  let currentScore = 0;
+  if (platScore) platScore.textContent = currentScore;
+
+  function endGame(win, score) {
+    if (platEndTitle) platEndTitle.textContent = win ? "Run Complete!" : "Mission Failed";
+    if (platEndEmoji) platEndEmoji.textContent = "";
+    if (platGameOverSub) platGameOverSub.textContent = `Progress: ${score} of 4 technologies unlocked`;
+    if (progressBar) progressBar.style.width = (score / 4 * 100) + '%';
+
+    const iconContainer = document.getElementById('platTechIcons');
+    if (iconContainer) {
+      iconContainer.querySelectorAll('.tech-icon-mini').forEach(icon => {
+        const tech = icon.dataset.tech;
+        if (collectedStacks.includes(tech)) icon.classList.add('active');
+        else icon.classList.remove('active');
+      });
+    }
+
+    overlayOver?.classList.add('visible');
+  }
+
+  async function startKaboom() {
+    overlayStart?.classList.remove('visible');
+    overlayOver?.classList.remove('visible');
+    collectedStacks = [];
     currentScore = 0;
     if (platScore) platScore.textContent = currentScore;
 
-    function endGame(win, score) {
-      if (platEndTitle) platEndTitle.textContent = win ? "Run Complete!" : "Mission Failed";
-      if (platEndEmoji) platEndEmoji.textContent = ""; // Emoji removed
-      
-      if (platGameOverSub) {
-        platGameOverSub.textContent = `Progress: ${score} of 4 technologies unlocked`;
-      }
-
-      const progressBar = document.getElementById('platProgressBar');
-      if (progressBar) {
-        progressBar.style.width = (score / 4 * 100) + '%';
-      }
-
-      // Highlight icons
-      const iconContainer = document.getElementById('platTechIcons');
-      if (iconContainer) {
-        iconContainer.querySelectorAll('.tech-icon-mini').forEach(icon => {
-          const tech = icon.dataset.tech;
-          if (collectedStacks.includes(tech)) {
-            icon.classList.add('active');
-          } else {
-            icon.classList.remove('active');
-          }
-        });
-      }
-
-      overlayOver?.classList.add('visible');
-    }
-
-    async function startKaboom() {
-      overlayStart.classList.remove('visible');
-      overlayOver.classList.remove('visible');
-      collectedStacks = [];
-      currentScore = 0;
-      if (platScore) platScore.textContent = currentScore;
-
-    // Clean up previous canvas if any
-    if (kaboomInst) {
-      kaboomInst.quit();
-    }
-    const canvas = container.querySelector('canvas');
-    if (canvas) canvas.remove();
+    if (kaboomInst) kaboomInst.quit();
+    const oldCanvas = container.querySelector('canvas');
+    if (oldCanvas) oldCanvas.remove();
 
     kaboomInst = kaboom({
       root: container,
@@ -1491,19 +1484,23 @@ function initPlatformerGame() {
       global: false
     });
 
-    // Load sprites from The Spriters Resource
-    await kaboomInst.loadSprite("player", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAAAgCAYAAADaInAlAAABRUlEQVR4nO2aQQrCMBBFjYgHij2IVxAEwRO4cG9PIAgFr9BziORAbupCW100nZAmJOH/twpNm9/FIzMpVQuSNaet7uauUbdG2eaWcxcnZbOSbohtIPPTwh0AHHEHIGVQt2YYn7ba+TkKkDl9+eiet8lSVLeHYXw5f8aqOoilJ5gAvgYyPy3OzYlkoKp+BnbPW38tWPPD/Ol8yzuJ+WwCwQlWAnrrU4Ge7wubwMzR19d36797P2uOa2spoACFsHnsoqwrChDbQOanxXkHiGUg89PCUwA4FAAcCgAOBQCHx8DM0eZonTP66nbfxPoUoGD+j5d6v/f6ccVZgDHDJAP/5+eCnh8LUYDesjHDJANDfABBz48Nm0BwKAA4FAAcCgAOBQCnmO8ATdNk3VHHej/XdX3zuQOAQwHAoQDgOPcAUo3JvUaTcd6CJKUMrS6cwgAAAABJRU5ErkJggg==", {
-      sliceX: 4, sliceY: 1,
+    const k = kaboomInst;
+
+    await k.loadSprite("player", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAAAgCAYAAADaInAlAAABRUlEQVR4nO2aQQrCMBBFjYgHij2IVxAEwRO4cG9PIAgFr9BziORAbupCW100nZAmJOH/twpNm9/FIzMpVQuSNaet7uauUbdG2eaWcxcnZbOSbohtIPPTwh0AHHEHIGVQt2YYn7ba+TkKkDl9+eiet8lSVLeHYXw5f8aqOoilJ5gAvgYyPy3OzYlkoKp+BnbPW38tWPPD/Ol8yzuJ+WwCwQlWAnrrU4Ge7wubwMzR19d36797P2uOa2spoACFsHnsoqwrChDbQOanxXkHiGUg89PCUwA4FAAcCgAOBQCHx8DM0eZonTP66nbfxPoUoGD+j5d6v/f6ccVZgDHDJAP/5+eCnh8LUYDesjHDJANDfABBz48Nm0BwKAA4FAAcCgAOBQCnmO8ATdNk3VHHej/XdX3zuQOAQwHAoQDgOPcAUo3JvUaTcd6CJKUMrS6cwgAAAABJRU5ErkJggg==", {
+      sliceX: 4,
+      sliceY: 1,
       anims: {
         idle: 0,
         run: { from: 1, to: 2, loop: true, speed: 8 },
         jump: 3
       }
     });
-    await kaboomInst.loadSprite("bg", "data:image/png;base64,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");
-    await kaboomInst.loadSprite("tiles", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAvklEQVR4nO2YoRGDMBhGA4epZgNMfWaKaTxT4DMMQ8TXsAECVdkqJDk4KC93+d4A/O/ehSRQdUP3NSBTP1Xk/JocngMKQAvQKAAtQKMAtABN8QGa17igAj06XStAARpaIISAfotoBdACK9baW+fFGI0xBwK858/uhz/bx3EjiOJfAQWgBWgUgBag2X0K/HtnX4+lu8nmHrDFFWFSdww8gPc++VvcOXf6qpyaUfweoAC0AI0C0AI0CkAL0BQf4AcRbBnu4KfCpgAAAABJRU5ErkJggg==", { sliceX: 2, sliceY: 1 });
-    await kaboomInst.loadSprite("items", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAFRElEQVR4nO2csXHrMAyGoXfvLnNkhwyQJl32SCoP4yrZI12aDJAdMkcqvca0aYukST7C5A/+X6U72kdAAAiIErEIyWZd19Vd/77fb8bvXn6O18uyLLeR6v+AEHIEnPFDhr/EOQKCEwwvYAw/Gh1aN7zE+A5tJ2il/9824tyOkOKXYwiRV0tr/aFuVI8cHIt+f66YTK1XAQ39YVaAnGXYjd29/Mi6rqullUBL/z+tBNSkNAe736WWSyQ09YdwAKJHdQq4VRVem4N/3+9NpAJt/YsdYLYqfFmWZV3X9e7lZ3ODU6DsBRQ5QG4Vih51M5FdA/hLUcz7/TErBZjIKYpDy24IlOgXyXSA2atwkXMniDmCP4ZgfJHMjaDeW6G95w/JkkJrTg39r9YAs1fhlzhdbvkuQhOIfYARc/ASQHMuER39YbaC/ccxETvv43PR0h/GAURON0EkHQ3WjO/Q0B/KAUTs5eBSWusP8RRA9IAoAokeWQ4wYhVO2lBkIItfxc5OsZF67IQRPaoNNWsVTgghhBBCCDys2iux8hQEJ3BvrO2DwAg6Ar7xdx+Pm/H989fxGsUJIIQcAWf8kOEvcY6A4ATDCxijR3+AHOM7tJ2A/QESYwiRVwv7Axy4VQ6ORb8/V0ym1quAhv4wK0DOMuzG9s9f5j5H19If4oug0hzsfmflZJKm/hAOQPSA6Q9QmoN3H48mUoG2/uwPcAX3Lf7++Wtzg1Og7AVU9wdIVaHoUTcTxf0Bdh+PUe/3x6wUYCKnKA4tuyFQol+ksD/ArFW4yLkTxBzBH0MwvkjhyaBeW6G95w/JkkJrTg39s/sDzFqFX2LtbCLEPsCIObhHfwAN/WG2gv3HMRE77+Nz0dIfxgFEzs/Hp6LBmvEdGvpDOYCIvRxcStf+ACNU4aQtEEUg0aOoP8BIVThpQ3V/gNmqcKuwP8DksD8AIYQQQgghs8GqvRIrT0FwAvfG2j4IjKAj4Bt/+QyMP52uUZwAQsgROJ55CBh+89uDIyA4wfACxujRHyDH+Mf/KDsB+wMkxhAirxb2Bzhwqxwci35/rphMrVcBDf1hVoCcZdiNrU/2jqdp6Q/xRVBpDj7eCCMnkzT1h3AAogdMf4DSHLx82kgF2vqzP8AV3Lf469P2BqdA2Quo7g+QqkLRo24mivsDLJ9x7/fHrBRgIt5hjMCyGwIl+kUK+wPMWoWLnDtBzBH8MQTjixSeDOq1Fdp7/pAsKbTm1NA/uz/ArFX4JdbOJkLsA4yYg3v0B9DQH2Yr2H8cE7HzPj4XLf1hHEDk/Hx8KhqsGd+hoT+UA4jYy8GldO0PMEIVTtoCUQQSPYr6A4xUhZM2VPcHmK0Ktwr7A0wO+wMQQgghhBAyG6zaK7HyFAQncG+s7YPACDoCvvEfXveb8e+33fEaxQkghBwBZ/yQ4S9xjoDgBMMLGKNHf4Ac4zu0nYD9ARJjCJFXC/sDHLhVDo5Fvz9XTKbWq4CG/jArQM4y7Ma+33bmPkfX0h/ii6DSHOx+Z+Vkkqb+EA5A9IDpD1Cagx9e9yZSgbb+7A9wBfct/vfbbnODU6DsBVT3B0hVoehRNxPF/QEeXvdR7/fHrBRgIqcoDi27IVCiX6SwP8CsVbjIuRPEHMEfQzC+SOHJoF5bob3nD8mSQmtODf2z+wPMWoVfYu1sIsQ+wIg5uEd/AA39YbaC/ccxETvv43PR0h/GAUTOz8enosGa8R0a+kM5gIi9HFxK1/4AI1ThpC0QRSDRo6g/wEhVOGlDdX+A2apwq7A/wOSwPwAhhBBCCCGEEDIP/wDCugefa5645AAAAABJRU5ErkJggg==", {
-      sliceX: 4, sliceY: 4,
+
+    await k.loadSprite("bg", "data:image/png;base64,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");
+    await k.loadSprite("tiles", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAvklEQVR4nO2YoRGDMBhGA4epZgNMfWaKaTxT4DMMQ8TXsAECVdkqJDk4KC93+d4A/O/ehSRQdUP3NSBTP1Xk/JocngMKQAvQKAAtQKMAtABN8QGa17igAj06XStAARpaIISAfotoBdACK9baW+fFGI0xBwK858/uhz/bx3EjiOJfAQWgBWgUgBag2X0K/HtnX4+lu8nmHrDFFWFSdww8gPc++VvcOXf6qpyaUfweoAC0AI0C0AI0CkAL0BQf4AcRbBnu4KfCpgAAAABJRU5ErkJggg==", { sliceX: 2, sliceY: 1 });
+    await k.loadSprite("items", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAFRElEQVR4nO2csXHrMAyGoXfvLnNkhwyQJl32SCoP4yrZI12aDJAdMkcqvca0aYukST7C5A/+X6U72kdAAAiIErEIyWZd19Vd/77fb8bvXn6O18uyLLeR6v+AEHIEnPFDhr/EOQKCEwwvYAw/Gh1aN7zE+A5tJ2il/9824tyOkOKXYwiRV0tr/aFuVI8cHIt+f66YTK1XAQ39YVaAnGXYjd29/Mi6rqullUBL/z+tBNSkNAe736WWSyQ09YdwAKJHdQq4VRVem4N/3+9NpAJt/YsdYLYqfFmWZV3X9e7lZ3ODU6DsBRQ5QG4Vih51M5FdA/hLUcz7/TErBZjIKYpDy24IlOgXyXSA2atwkXMniDmCP4ZgfJHMjaDeW6G95w/JkkJrTg39r9YAs1fhlzhdbvkuQhOIfYARc/ASQHMuER39YbaC/ccxETvv43PR0h/GAURON0EkHQ3WjO/Q0B/KAUTs5eBSWusP8RRA9IAoAokeWQ4wYhVO2lBkIItfxc5OsZF67IQRPaoNNWsVTgghhBBCCDys2iux8hQEJ3BvrO2DwAg6Ar7xdx+Pm/H989fxGsUJIIQcAWf8kOEvcY6A4ATDCxijR3+AHOM7tJ2A/QESYwiRVwv7Axy4VQ6ORb8/V0ym1quAhv4wK0DOMuzG9s9f5j5H19If4oug0hzsfmflZJKm/hAOQPSA6Q9QmoN3H48mUoG2/uwPcAX3Lf7++Wtzg1Og7AVU9wdIVaHoUTcTxf0Bdh+PUe/3x6wUYCKnKA4tuyFQol+ksD/ArFW4yLkTxBzBH0MwvkjhyaBeW6G95w/JkkJrTg39s/sDzFqFX2LtbCLEPsCIObhHfwAN/WG2gv3HMRE77+Nz0dIfxgFEzs/Hp6LBmvEdGvpDOYCIvRxcStf+ACNU4aQtEEUg0aOoP8BIVThpQ3V/gNmqcKuwP8DksD8AIYQQQgghs8GqvRIrT0FwAvfG2j4IjKAj4Bt/+QyMP52uUZwAQsgROJ55CBh+89uDIyA4wfACxujRHyDH+Mf/KDsB+wMkxhAirxb2Bzhwqxwci35/rphMrVcBDf1hVoCcZdiNrU/2jqdp6Q/xRVBpDj7eCCMnkzT1h3AAogdMf4DSHLx82kgF2vqzP8AV3Lf469P2BqdA2Quo7g+QqkLRo24mivsDLJ9x7/fHrBRgIt5hjMCyGwIl+kUK+wPMWoWLnDtBzBH8MQTjixSeDOq1Fdp7/pAsKbTm1NA/uz/ArFX4JdbOJkLsA4yYg3v0B9DQH2Yr2H8cE7HzPj4XLf1hHEDk/Hx8KhqsGd+hoT+UA4jYy8GldO0PMEIVTtoCUQQSPYr6A4xUhZM2VPcHmK0Ktwr7A0wO+wMQQgghhBAyG6zaK7HyFAQncG+s7YPACDoCvvEfXveb8e+33fEaxQkghBwBZ/yQ4S9xjoDgBMMLGKNHf4Ac4zu0nYD9ARJjCJFXC/sDHLhVDo5Fvz9XTKbWq4CG/jArQM4y7Ma+33bmPkfX0h/ii6DSHOx+Z+Vkkqb+EA5A9IDpD1Cagx9e9yZSgbb+7A9wBfct/vfbbnODU6DsBVT3B0hVoehRNxPF/QEeXvdR7/fHrBRgIqcoDi27IVCiX6SwP8CsVbjIuRPEHMEfQzC+SOHJoF5bob3nD8mSQmtODf2z+wPMWoVfYu1sIsQ+wIg5uEd/AA39YbaC/ccxETvv43PR0h/GAUTOz8onosGa8R0a+kM5gIi9HFxK1/4AI1ThpC0QRSDRo6g/wEhVOGlDdX+A2apwq7A/wOSwPwAhhBBCCCGEEDIP/wDCugefa5645AAAAABJRU5ErkJggg==", {
+      sliceX: 4,
+      sliceY: 4,
       anims: {
         bounceJava: { from: 0, to: 3, loop: true, speed: 6 },
         bounceSpring: { from: 4, to: 7, loop: true, speed: 6 },
@@ -1512,22 +1509,14 @@ function initPlatformerGame() {
       }
     });
 
-
-    kaboomInst.scene("game", () => {
-      const k = kaboomInst;
+    k.scene("game", () => {
       k.setGravity(2400);
 
-      k.add([
-        k.sprite("bg", { width: 720, height: 400 }),
-        k.pos(0, 0),
-        k.fixed(),
-        k.z(-1)
-      ]);
+      k.add([k.sprite("bg", { width: 720, height: 400 }), k.pos(0, 0), k.fixed(), k.z(-1)]);
 
       let score = 0;
       if (platScore) platScore.textContent = score;
 
-      // Create player
       const player = k.add([
         k.sprite("player", { anim: "idle" }),
         k.area(),
@@ -1539,12 +1528,12 @@ function initPlatformerGame() {
       const SPEED = 250;
       const JUMP_FORCE = 800;
 
-      // Controls
       function goLeft() {
         player.move(-SPEED, 0);
         player.flipX = true;
         if (player.isGrounded() && player.curAnim() !== "run") player.play("run");
       }
+
       function goRight() {
         player.move(SPEED, 0);
         player.flipX = false;
@@ -1568,19 +1557,16 @@ function initPlatformerGame() {
           player.play("jump");
         }
       }
+
       k.onKeyPress("space", doJump);
       k.onKeyPress("up", doJump);
       k.onKeyPress("w", doJump);
 
       player.onGround(() => {
-        if (!k.isKeyDown("left") && !k.isKeyDown("right") && !k.isKeyDown("a") && !k.isKeyDown("d")) {
-          player.play("idle");
-        } else {
-          player.play("run");
-        }
+        if (!k.isKeyDown("left") && !k.isKeyDown("right") && !k.isKeyDown("a") && !k.isKeyDown("d")) player.play("idle");
+        else player.play("run");
       });
 
-      // Level map layout (compact, < 1 min)
       const levelData = [
         "                                           ",
         "                                           ",
@@ -1612,7 +1598,7 @@ function initPlatformerGame() {
 
       k.addLevel(levelData, levelConf);
 
-      player.onCollide("stack", (item) => {
+      player.onCollide("stack", item => {
         k.destroy(item);
         k.add([
           k.text("+ " + item.name, { size: 16 }),
@@ -1628,14 +1614,12 @@ function initPlatformerGame() {
 
       player.onCollide("finish", () => {
         endGame(true, score);
-        k.scene("pause", () => { }); // blank scene to stop gameplay updates
+        k.scene("pause", () => { });
         k.go("pause");
       });
 
       player.onUpdate(() => {
         k.camPos(Math.max(360, player.pos.x), 200);
-
-        // Fall off map
         if (player.pos.y > 600) {
           endGame(false, score);
           k.scene("pause", () => { });
@@ -1644,7 +1628,7 @@ function initPlatformerGame() {
       });
     });
 
-    kaboomInst.go("game");
+    k.go("game");
   }
 
   domStartBtn?.addEventListener('click', startKaboom);
@@ -1656,9 +1640,19 @@ function initPlatformerGame() {
     openWindow('projectsWindow', 'dockFinder');
   });
 
-  // Initialize UI state
-  overlayStart?.classList.remove('visible');
+  overlayStart?.classList.add('visible');
   overlayOver?.classList.remove('visible');
   if (platScore) platScore.textContent = '0';
-  startKaboom();
 }
+
+/* ═══════════════════════════
+   INIT
+═══════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  initDockMagnification();
+  initParallax();
+  initFolders();
+  initDraggableWindows();
+  initClockWidget();
+  initQuoteWidget();
+});
