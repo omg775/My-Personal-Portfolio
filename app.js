@@ -50,7 +50,6 @@ const PROJECTS = [
     stack: ['Python', 'Streamlit', 'Azure OpenAI', 'Whisper', 'Azure'],
     cat: 'fullstack',
     github: 'https://github.com/omg775/Medinoted-AI',
-    demo: '#'
   },
   {
     icon: '⚡',
@@ -59,7 +58,6 @@ const PROJECTS = [
     stack: ['Java', 'Spring Boot', 'Gemini API', 'Chrome Extension', 'JavaScript'],
     cat: 'tool',
     github: 'https://github.com/omg775/ClarityAI',
-    demo: '#'
   },
   {
     icon: '🧩',
@@ -68,7 +66,6 @@ const PROJECTS = [
     stack: ['Java', 'Node.js', 'Socket.io', 'TCP/UDP', 'AWS'],
     cat: 'backend',
     github: 'https://github.com/omg775/Real-time-Collaborative-Whiteboard',
-    demo: '#'
   },
   {
     icon: '🖥️',
@@ -77,16 +74,15 @@ const PROJECTS = [
     stack: ['React', 'JavaScript', 'Tailwind CSS', 'Framer Motion'],
     cat: 'frontend',
     github: 'https://github.com/omg775/My-Personal-Portfolio',
-    demo: '#'
   },
   {
     icon: '📅',
-    title: 'Exam Scheduler',
-    desc: 'Full-stack exam scheduling system with a Spring Boot API, PostgreSQL database, and React frontend for managing and visualizing exam data.',
-    stack: ['React', 'Spring Boot', 'PostgreSQL', 'Docker', 'Heroku', 'Vercel'],
-    cat: 'fullstack',
-    github: 'https://github.com/omg775',
-    demo: '#'
+    title: 'Simulation-Based System for Automated Network Traffic Anomaly Detection',
+    desc: 'Designed and implemented a simulation-based system for automated network traffic anomaly detection, utilizing machine learning algorithms to identify and classify potential security threats in real-time.',
+    stack: ['Spring Boot', 'PostgreSQL', 'Hibernate', 'Embedded Tomcat', 'Apache Commons Csv'],
+    cat: 'Backend',
+    github: 'https://github.com/omg775/AnomalyDetectionApplication',
+  
   }
 ];
 
