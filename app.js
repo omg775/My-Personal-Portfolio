@@ -80,7 +80,7 @@ const PROJECTS = [
     title: 'Simulation-Based System for Automated Network Traffic Anomaly Detection',
     desc: 'Designed and implemented a simulation-based system for automated network traffic anomaly detection, utilizing machine learning algorithms to identify and classify potential security threats in real-time.',
     stack: ['Spring Boot', 'PostgreSQL', 'Hibernate', 'Embedded Tomcat', 'Apache Commons Csv'],
-    cat: 'Backend',
+    cat: 'backend',
     github: 'https://github.com/omg775/AnomalyDetectionApplication',
   
   }
