@@ -53,10 +53,20 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background-image: url('assets/wallpaper.jpg');
+  background-image: url('assets/portfolio_wallpaper.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+.bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Dark overlay so UI stays readable */
@@ -1317,7 +1327,6 @@ body::after {
   line-height: 1.7;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
 }
 
 .terminal-lines {
@@ -1392,6 +1401,17 @@ body::after {
 .tcursor {
   color: var(--text);
   animation: blink 1.1s step-end infinite;
+}
+
+.terminal-hidden-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  pointer-events: none;
 }
 
 @keyframes blink {
@@ -1518,6 +1538,29 @@ body::after {
   line-height: 1.6;
   color: rgba(238, 238, 245, 0.82);
 }
+
+.note-item-desc-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+}
+
+.note-item-desc-bullets li {
+  font-size: 13.5px;
+  color: rgba(238, 238, 245, 0.82);
+  margin-bottom: 6px;
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.note-item-desc-bullets li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #ff9f0a;
+}
+
 
 /* Education Layout */
 .edu-institution {

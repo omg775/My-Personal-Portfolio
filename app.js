@@ -82,7 +82,7 @@ const PROJECTS = [
     stack: ['Spring Boot', 'PostgreSQL', 'Hibernate', 'Embedded Tomcat', 'Apache Commons Csv'],
     cat: 'backend',
     github: 'https://github.com/omg775/AnomalyDetectionApplication',
-  
+
   }
 ];
 
@@ -283,42 +283,6 @@ let kaboomInst = null;
 /* ═══════════════════════════
    CANVAS: STARS
 ═══════════════════════════ */
-(function initStars() {
-  const canvas = document.getElementById('bgCanvas');
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  let stars = [];
-
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    stars = Array.from({ length: 160 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.2 + 0.2,
-      a: Math.random() * 0.6 + 0.1,
-      speed: Math.random() * 0.3 + 0.1,
-      phase: Math.random() * Math.PI * 2,
-    }));
-  }
-
-  function draw(t) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    stars.forEach(s => {
-      const a = s.a * (0.6 + 0.4 * Math.sin(t * s.speed + s.phase));
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${a})`;
-      ctx.fill();
-    });
-    requestAnimationFrame(ts => draw(ts / 1000));
-  }
-
-  window.addEventListener('resize', resize);
-  resize();
-  draw(0);
-})();
 
 /* ═══════════════════════════
    CLOCK
@@ -374,6 +338,8 @@ function openWindow(winId, dockId) {
 
   winEl.classList.add('active');
   dockEl?.classList.add('running');
+  winEl.scrollTop = 0;
+  winEl.scrollLeft = 0;
 
   activeWindowId = winId;
   activeDockId = dockId || null;
@@ -385,7 +351,17 @@ function openWindow(winId, dockId) {
   if (winId === 'resumeWindow' && !resumeRendered) renderResume();
   if (winId === 'ideasWindow') renderBuildLab();
   if (winId === 'nowWindow') renderNow();
-  if (winId === 'skillsWindow' && !terminalDone) setTimeout(animateTerminal, 180);
+  if (winId === 'skillsWindow') {
+    if (!terminalDone) {
+      setTimeout(animateTerminal, 180);
+    } else {
+      setTimeout(() => {
+        const promptRow = document.getElementById('terminalPromptRow');
+        if (promptRow) promptRow.style.display = 'flex';
+        document.getElementById('terminalInput')?.focus();
+      }, 180);
+    }
+  }
   if (winId === 'arcadeWindow') setTimeout(initPlatformerGame, 80);
 }
 
@@ -566,6 +542,33 @@ function renderNotesContent(tab) {
     title = 'Achievements';
     content = ACHIEVEMENTS;
     countText = `Updated March 2026 · ${ACHIEVEMENTS.length} items`;
+  } else if (tab === 'experience') {
+    title = 'Work Experience';
+    countText = `Updated March 2026 · 2 items`;
+    content = [
+      {
+        title: 'Backend Engineer',
+        org: 'Atomity',
+        date: 'May 2026 – Present',
+        desc: [
+          'Designed in-memory pipeline tests by creating an isolated testing profile (application-test.yml) with dynamic cryptographic token generation to meet security compliance requirements and decouple CI/CD workflows from external databases.',
+          'Resolved complex dependency and build-cycle issues in build.gradle.kts by optimizing Protobuf and gRPC configurations, improving overall build stability and CI/CD efficiency.',
+          'Implemented a robust test isolation strategy using @MockitoBean for service stubbing, decoupling integration tests from external systems such as NATS, PostgreSQL, and Redis, significantly improving test reliability and reducing execution time.'
+        ]
+      },
+      {
+        title: 'Automated Testing in Java Trainee',
+        org: 'EPAM',
+        date: 'Feb 2026 – May 2026',
+        desc: [
+          'Developed and maintained RESTful APIs using Java and Spring Boot, with frontend integration using HTML, CSS, and JavaScript.',
+          'Collaborated with team members through code reviews, knowledge-sharing sessions, and agile development practices.',
+          'Strengthened Java and Spring Boot skills through hands-on experience, contributing to test automation improvements and increased development efficiency.',
+          'Used Git for version control and followed best practices for CI/CD, testing, and code quality to ensure reliable feature delivery.',
+          'Worked on web application development using Angular, SQL, and REST APIs while handling multiple tickets and supporting team productivity through peer reviews.'
+        ]
+      }
+    ];
   }
 
   titleEl.textContent = title;
@@ -575,13 +578,21 @@ function renderNotesContent(tab) {
     content.forEach((item, i) => {
       const el = document.createElement('div');
       el.className = 'note-item';
+
+      let descHtml = '';
+      if (Array.isArray(item.desc)) {
+        descHtml = `<ul class="note-item-desc-bullets">${item.desc.map(bullet => `<li>${bullet}</li>`).join('')}</ul>`;
+      } else {
+        descHtml = `<p class="note-item-desc">${item.desc}</p>`;
+      }
+
       el.innerHTML = `
         <div class="note-item-header">
           <div class="note-item-title">${item.title}</div>
           ${item.date ? `<div class="note-item-date">${item.date}</div>` : ''}
         </div>
         ${item.org ? `<div class="note-item-org">${item.org}</div>` : ''}
-        <p class="note-item-desc">${item.desc}</p>
+        ${descHtml}
       `;
       applyNoteAnimation(el, i);
       container.appendChild(el);
@@ -827,6 +838,216 @@ async function animateTerminal() {
   await wait(400);
   addLine('tcmt', '');
   addLine('tsuc', '# Stack loaded. Ready to ship 🚀');
+
+  const promptRow = document.getElementById('terminalPromptRow');
+  if (promptRow) {
+    promptRow.style.display = 'flex';
+    document.getElementById('terminalInput')?.focus();
+  }
+}
+
+function initInteractiveTerminal() {
+  const content = document.getElementById('terminalContent');
+  const input = document.getElementById('terminalInput');
+  const visualValue = document.getElementById('terminalInputValue');
+
+  if (!content || !input) return;
+
+  content.addEventListener('click', () => {
+    input.focus();
+  });
+
+  input.addEventListener('input', () => {
+    if (visualValue) visualValue.textContent = input.value;
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const command = input.value.trim();
+      input.value = '';
+      if (visualValue) visualValue.textContent = '';
+      
+      printPromptLine(command);
+      
+      if (command) {
+        handleTerminalCommand(command);
+      }
+    }
+  });
+}
+
+function printPromptLine(command) {
+  const out = document.getElementById('terminalOutput');
+  if (!out) return;
+  const row = document.createElement('div');
+  row.className = 'tl-row';
+  row.innerHTML = `<span class="tp">om@portfolio</span><span class="tsep">:</span><span class="tpath">~/skills</span><span class="tsym">$</span>&nbsp;<span class="tcmd">${command}</span>`;
+  out.appendChild(row);
+  out.parentElement.scrollTop = out.parentElement.scrollHeight;
+}
+
+function printTerminalLines(lines) {
+  const out = document.getElementById('terminalOutput');
+  if (!out) return;
+  lines.forEach(line => {
+    const row = document.createElement('div');
+    row.className = 'tl-row';
+    const sp = document.createElement('span');
+    sp.className = 'tout';
+    if (line.startsWith('▸')) {
+      sp.className = 'tcat';
+    } else if (line.startsWith('✓')) {
+      sp.className = 'tsuc';
+    } else if (line.startsWith('#')) {
+      sp.className = 'tcmt';
+    } else if (line.startsWith('  ▸') || line.startsWith('    -')) {
+      sp.className = 'tskill';
+    }
+    sp.textContent = line;
+    row.appendChild(sp);
+    out.appendChild(row);
+  });
+  out.parentElement.scrollTop = out.parentElement.scrollHeight;
+}
+
+function changeTerminalTheme(themeName) {
+  const termBody = document.querySelector('.terminal-body');
+  if (!termBody) return 'Terminal element not found.';
+  
+  if (themeName === 'matrix') {
+    termBody.style.background = '#000000';
+    termBody.style.color = '#39ff14';
+    termBody.style.fontFamily = 'monospace';
+    return 'Theme changed to Matrix (Green on Black)';
+  } else if (themeName === 'classic') {
+    termBody.style.background = '#000000';
+    termBody.style.color = '#ffffff';
+    termBody.style.fontFamily = 'monospace';
+    return 'Theme changed to Classic (White on Black)';
+  } else if (themeName === 'dracula') {
+    termBody.style.background = '#282a36';
+    termBody.style.color = '#f8f8f2';
+    termBody.style.fontFamily = 'monospace';
+    return 'Theme changed to Dracula';
+  } else if (themeName === 'default') {
+    termBody.style.background = '';
+    termBody.style.color = '';
+    termBody.style.fontFamily = '';
+    return 'Theme reset to Default macOS';
+  } else {
+    return `Unknown theme: "${themeName}". Available themes: default, matrix, classic, dracula`;
+  }
+}
+
+function handleTerminalCommand(rawCommand) {
+  const parts = rawCommand.split(/\s+/);
+  const command = parts[0].toLowerCase();
+  const arg = parts.slice(1).join(' ').toLowerCase();
+
+  let response = [];
+
+  switch (command) {
+    case 'help':
+      response = [
+        'Available commands:',
+        '  ls            - List files in current directory',
+        '  cat <file>    - Display the contents of a file',
+        '  skills        - Show detailed skills breakdown',
+        '  clear         - Clear the terminal screen',
+        '  theme <name>  - Change theme (default, matrix, classic, dracula)',
+        '  about         - Display summary about me',
+        '  contact       - Print my contact details',
+        '  help          - Show this help message'
+      ];
+      break;
+    case 'ls':
+      if (arg === 'projects') {
+        response = [
+          'Clarity AI',
+          'Medinoted AI',
+          'Real-Time Collaborative Whiteboard',
+          'Automated Network Traffic Anomaly Detection'
+        ];
+      } else {
+        response = ['about.txt     contact.txt   skills.json   projects.txt'];
+      }
+      break;
+    case 'cat':
+      if (!arg) {
+        response = ['Usage: cat <filename>'];
+      } else if (arg === 'about.txt' || arg === 'about') {
+        response = [
+          'Om Gawde — Computer Science student with a strong foundation in programming,',
+          'problem-solving, and backend software development. Motivated to build',
+          'scalable systems and elegant developer tools.'
+        ];
+      } else if (arg === 'contact.txt' || arg === 'contact') {
+        response = [
+          'Email:    omgawde775@gmail.com',
+          'LinkedIn: linkedin.com/in/om-gawde-692073272/',
+          'GitHub:   github.com/omg775'
+        ];
+      } else if (arg === 'skills.json' || arg === 'skills') {
+        response = [
+          'Languages:             Java, Python',
+          'Frameworks & Libs:     Spring Boot, Hibernate, React, Streamlit',
+          'Databases:             PostgreSQL, MySQL, SQLite, Supabase',
+          'DevOps & Cloud:        Git, GitHub Actions, Docker, AWS, Azure, Vercel',
+          'Tools & Environments:  Bash, Maven, Tomcat, Vite, Postman, Linux CLI',
+          'Design:                Figma, Canva, Adobe Illustrator'
+        ];
+      } else if (arg === 'projects.txt' || arg === 'projects') {
+        response = [
+          'Projects:',
+          '  ▸ Clarity AI — Chrome Extension + Spring Boot Backend',
+          '  ▸ Medinoted AI — Full-Stack AI Health Platform',
+          '  ▸ Real-Time Collaborative Whiteboard — Distributed Systems Project',
+          '  ▸ Automated Network Traffic Anomaly Detection — Simulation-Based ML System'
+        ];
+      } else {
+        response = [`cat: ${arg}: No such file or directory`];
+      }
+      break;
+    case 'skills':
+      response = [
+        'Languages:             Java, Python',
+        'Frameworks & Libs:     Spring Boot, Hibernate, React, Streamlit',
+        'Databases:             PostgreSQL, MySQL, SQLite, Supabase',
+        'DevOps & Cloud:        Git, GitHub Actions, Docker, AWS, Azure, Vercel',
+        'Tools & Environments:  Bash, Maven, Tomcat, Vite, Postman, Linux CLI',
+        'Design:                Figma, Canva, Adobe Illustrator'
+      ];
+      break;
+    case 'clear':
+      const out = document.getElementById('terminalOutput');
+      if (out) out.innerHTML = '';
+      return;
+    case 'theme':
+      if (!arg) {
+        response = ['Usage: theme <name> (available: default, matrix, classic, dracula)'];
+      } else {
+        response = [changeTerminalTheme(arg)];
+      }
+      break;
+    case 'about':
+      response = [
+        'Om Gawde — Software Engineer based in Budapest.',
+        'Studying Computer Science at University of Dunaújváros.',
+        'Interested in Backend systems, distributed applications, and AI platform integration.'
+      ];
+      break;
+    case 'contact':
+      response = [
+        'Email:    omgawde775@gmail.com',
+        'LinkedIn: https://www.linkedin.com/in/om-gawde-692073272/',
+        'GitHub:   https://github.com/omg775'
+      ];
+      break;
+    default:
+      response = [`zsh: command not found: ${command}`];
+  }
+
+  printTerminalLines(response);
 }
 
 /* ═══════════════════════════
@@ -1657,4 +1878,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initDraggableWindows();
   initClockWidget();
   initQuoteWidget();
+  initInteractiveTerminal();
 });
