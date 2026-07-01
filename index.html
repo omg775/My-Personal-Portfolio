@@ -68,6 +68,10 @@
           <path d="M21.5 4.5v5c1.5-.5 1.5-4.5 0-5z" fill="currentColor" fill-opacity="0.5" />
         </svg>
       </span>
+      <button class="siri-btn" id="siriBtn" onclick="toggleSiri()" title="Ask Om's AI" aria-label="Open AI Assistant">
+        <div class="siri-orb"></div>
+        <span>Siri</span>
+      </button>
       <span class="menu-clock" id="menuClock" aria-live="polite">12:00 PM</span>
     </div>
   </nav>
@@ -576,6 +580,22 @@
       </div>
     </div>
 
+    <!-- ── MUSIC WINDOW ── -->
+    <div class="window win-music" id="musicWindow" role="dialog" aria-label="Apple Music">
+      <div class="win-chrome">
+        <div class="traffic-lights">
+          <button class="tl red" onclick="closeWindow('musicWindow')" aria-label="Close"></button>
+          <button class="tl yellow" aria-label="Minimize"></button>
+          <button class="tl green" aria-label="Maximize"></button>
+        </div>
+        <div class="win-title-label">Apple Music</div>
+        <div class="win-chrome-end"></div>
+      </div>
+      <div class="win-body music-body" style="padding: 0; background: #1c1c1e; overflow: hidden;">
+        <iframe allow="autoplay *; encrypted-media *;" frameborder="0" style="width:100%; height:100%; overflow:hidden; background:transparent; border: none;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/playlist/top-100-global/pl.d25f5d1181894928af76c85c967f8f31"></iframe>
+      </div>
+    </div>
+
   </main>
 
   <!-- ========================
@@ -652,6 +672,15 @@
         <div class="dock-pip"></div>
       </div>
 
+      <div class="dock-item" id="dockMusic" onclick="openWindow('musicWindow','dockMusic')" title="Apple Music"
+        tabindex="0" role="button" aria-label="Open Apple Music">
+        <div class="dock-icon-wrap">
+          <img class="di-img" src="assets/music.png" alt="Apple Music" draggable="false" />
+        </div>
+        <span class="dock-tooltip">Music</span>
+        <div class="dock-pip"></div>
+      </div>
+
     </div>
   </footer>
 
@@ -673,6 +702,35 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- SIRI AI PANEL -->
+  <div class="siri-panel" id="siriPanel" role="dialog" aria-label="Om's AI Assistant">
+    <div class="siri-panel-header">
+      <div class="siri-panel-title">
+        <div class="siri-panel-orb"></div>
+        Ask Om's AI
+      </div>
+      <button class="siri-panel-close" onclick="closeSiri()" aria-label="Close">✕</button>
+    </div>
+    <div class="siri-messages" id="siriMessages">
+      <div class="siri-msg ai">
+        <div class="siri-bubble">Hi! 👋 I'm Om's personal AI. Ask me anything about his skills, projects, experience, or how to get in touch!</div>
+      </div>
+    </div>
+    <div class="siri-suggestions" id="siriSuggestions">
+      <button class="siri-suggestion" onclick="siriSuggestion('What are Om\'s main skills?')">🛠 Skills</button>
+      <button class="siri-suggestion" onclick="siriSuggestion('Tell me about his projects')">🧩 Projects</button>
+      <button class="siri-suggestion" onclick="siriSuggestion('What is his work experience?')">💼 Experience</button>
+      <button class="siri-suggestion" onclick="siriSuggestion('How can I contact Om?')">📬 Contact</button>
+    </div>
+    <div class="siri-input-area">
+      <input type="text" class="siri-input" id="siriInput" placeholder="Ask anything about Om…" autocomplete="off"
+        onkeydown="if(event.key==='Enter') sendSiriMessage()" />
+      <button class="siri-send-btn" onclick="sendSiriMessage()" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/kaboom@3000.1.17/dist/kaboom.js"></script>
   <script src="app.js"></script>

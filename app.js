@@ -312,6 +312,7 @@ const DOCK_MAP = {
   contactWindow: 'dockMail',
   resumeWindow: 'dockPreview',
   arcadeWindow: 'dockArcade',
+  musicWindow: 'dockMusic',
 };
 
 function bringToFront(winEl) {
@@ -866,9 +867,9 @@ function initInteractiveTerminal() {
       const command = input.value.trim();
       input.value = '';
       if (visualValue) visualValue.textContent = '';
-      
+
       printPromptLine(command);
-      
+
       if (command) {
         handleTerminalCommand(command);
       }
@@ -913,7 +914,7 @@ function printTerminalLines(lines) {
 function changeTerminalTheme(themeName) {
   const termBody = document.querySelector('.terminal-body');
   if (!termBody) return 'Terminal element not found.';
-  
+
   if (themeName === 'matrix') {
     termBody.style.background = '#000000';
     termBody.style.color = '#39ff14';
@@ -1879,4 +1880,249 @@ document.addEventListener('DOMContentLoaded', () => {
   initClockWidget();
   initQuoteWidget();
   initInteractiveTerminal();
+});
+
+/* ═══════════════════════════════════════════
+   SIRI AI ASSISTANT
+   Powered by Groq (Llama 3.3 70B — free tier)
+   groq.com → console.groq.com/keys
+═══════════════════════════════════════════ */
+let GROQ_API_KEY = localStorage.getItem('GROQ_API_KEY') || '';
+
+async function loadEnv() {
+  try {
+    const res = await fetch('.env');
+    if (!res.ok) return;
+    const text = await res.text();
+    const lines = text.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        const equalsIndex = trimmed.indexOf('=');
+        if (equalsIndex > 0) {
+          const key = trimmed.slice(0, equalsIndex).trim();
+          const value = trimmed.slice(equalsIndex + 1).trim().replace(/^["']|["']$/g, '');
+          if (key === 'GROQ_API_KEY') {
+            GROQ_API_KEY = value;
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Could not load .env file. Running without local env keys.', err);
+  }
+}
+
+// Start loading env immediately
+loadEnv();
+
+
+const SIRI_SYSTEM_PROMPT = `You are Om Gawde's personal AI assistant embedded in his portfolio website. Your job is to answer questions about Om on his behalf — like a smart, friendly personal agent. Be conversational and concise (2-4 sentences per response). If asked something you don't know, say you're not sure and suggest they email Om directly. Never make things up.
+
+Here is everything you know about Om Gawde:
+
+PERSONAL:
+- Full name: Om Gawde
+- Based in: Budapest, Hungary
+- Email: omgawde775@gmail.com
+- LinkedIn: linkedin.com/in/om-gawde-692073272
+- GitHub: github.com/omg775
+
+EDUCATION:
+- University of Dunaújváros, Hungary
+- Degree: BSc Computer Science Engineering
+- Duration: 2023 – 2027
+- GPA: 4.7 / 5.0
+- Notable: Won TDK Talent Day two years in a row, Won Google Developer Student Clubs (GDSC) competition against multiple Hungarian universities, Founded a Computer Science Club, Participated in the Hungarian Startup University Program (HSUP)
+
+WORK EXPERIENCE:
+1. Backend Engineer at Atomity (May 2026 – Present)
+   - Designed in-memory pipeline tests with an isolated testing profile (application-test.yml), dynamic cryptographic token generation for security compliance, and decoupled CI/CD from external databases.
+   - Resolved complex dependency and build-cycle issues in build.gradle.kts by optimizing Protobuf and gRPC configurations, improving build stability.
+   - Implemented test isolation using @MockitoBean to stub services like NATS, PostgreSQL, and Redis — reducing test execution time significantly.
+
+2. Automated Testing in Java Trainee at EPAM (Feb 2026 – May 2026)
+   - Developed and maintained RESTful APIs using Java and Spring Boot with HTML/CSS/JS frontend.
+   - Worked with Angular, SQL, REST APIs, and participated in agile code reviews.
+   - Contributed to test automation and CI/CD pipelines using Git and best practices.
+
+3. Camp Counsellor at Camp America (Jun 2025 – Aug 2025)
+   - Resident Counselor in the United States, helping students transition into university life.
+   - Assisted with orientation, accommodation, and day-to-day guidance.
+
+4. Data Analyst at Cretech Engineering (2022 – 2023)
+   - Built and maintained Excel spreadsheets for company data analysis and decision support.
+   - Supported the accounting department with financial records and reporting.
+
+PROJECTS:
+1. Medinoted AI — AI-powered clinical note cleaner and health diary platform with voice transcription (Whisper), SOAP note formatting, sentiment tracking, and health insights. Tech: Python, Streamlit, Azure OpenAI, Whisper, Azure. GitHub: github.com/omg775/Medinoted-AI
+
+2. Clarity AI — Chrome extension that summarizes notes, extracts key insights, and suggests related topics using the Gemini API. Has a Spring Boot backend for fast processing. Tech: Java, Spring Boot, Gemini API, Chrome Extension, JavaScript. GitHub: github.com/omg775/ClarityAI
+
+3. Real-time Collaborative Whiteboard — Distributed whiteboard system exploring RPC, RMI, P2P, and WebSocket architectures for real-time collaboration. Tech: Java, Node.js, Socket.io, TCP/UDP, AWS. GitHub: github.com/omg775/Real-time-Collaborative-Whiteboard
+
+4. My Personal Portfolio — This very website! Interactive macOS-style portfolio with draggable windows, desktop UI, widgets, a mini-game, and an AI assistant. Tech: JavaScript, HTML, CSS.
+
+5. Anomaly Detection Application — Simulation-based system for automated network traffic anomaly detection using machine learning for real-time security threat classification. Tech: Spring Boot, PostgreSQL, Hibernate, Embedded Tomcat, Apache Commons CSV. GitHub: github.com/omg775/AnomalyDetectionApplication
+
+SKILLS:
+- Languages: Java, Python, PHP, Octave, JavaScript, HTML, CSS
+- Frameworks & Libraries: Spring Boot, Hibernate, React, React Native, Streamlit
+- Databases: PostgreSQL, MySQL, SQLite, Supabase
+- DevOps & Cloud: Git, GitHub, GitLab, GitHub Actions, Docker, AWS, Azure, Vercel, Netlify
+- Tools: Apache Maven, Apache Tomcat, Postman, Vite, Bash Scripting, Windows Terminal
+- Design: Figma, Canva, Adobe Illustrator
+
+CERTIFICATIONS:
+- Java Course — NIX Europe (Feb 2026): Core Java, OOP, backend fundamentals.
+- Startup Fundamentals — Hungarian Startup University HSUP (Dec 2025): Entrepreneurship, business strategy, innovation.
+- Front-End Engineering Simulation — Skyscanner / Forage (Jan 2026): Built a React-based web app.
+- Software Engineering Simulation — Commonwealth Bank / Forage (Jan 2026): Web development and cybersecurity tasks.
+- Master Java, Spring Boot & Microservices — Telusko (2026): Spring Security, microservices, Docker.
+
+ACHIEVEMENTS:
+- Won Google Developer Student Clubs (GDSC) Competition against teams from multiple Hungarian universities.
+- Won TDK Talent Day two consecutive years.
+- Founded a Computer Science Club at university.
+- Built multiple production-level full-stack and AI applications.
+
+CURRENTLY WORKING ON:
+- Building a production-ready Spring Boot microservices system with JWT authentication, Redis session management, and Docker deployment.
+- Studying system design: distributed systems, consistent hashing, CAP theorem, and advanced Java concurrency.
+- Targeting backend-focused internship opportunities in developer tools or fintech.
+
+LONG-TERM GOAL:
+To become an engineer who can design and build scalable systems from the ground up — with deep expertise in architecture, performance, and long-term software quality.`;
+
+let siriHistory = [];
+let siriOpen = false;
+let _typingId = 0;
+
+function toggleSiri() {
+  const panel = document.getElementById('siriPanel');
+  const btn = document.getElementById('siriBtn');
+  siriOpen = !siriOpen;
+  panel.classList.toggle('open', siriOpen);
+  btn.classList.toggle('active', siriOpen);
+  if (siriOpen) setTimeout(() => document.getElementById('siriInput')?.focus(), 50);
+}
+
+function closeSiri() {
+  siriOpen = false;
+  document.getElementById('siriPanel')?.classList.remove('open');
+  document.getElementById('siriBtn')?.classList.remove('active');
+}
+
+function siriSuggestion(text) {
+  const input = document.getElementById('siriInput');
+  if (input) input.value = text;
+  sendSiriMessage();
+}
+
+async function sendSiriMessage() {
+  const input = document.getElementById('siriInput');
+  const msg = input?.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  // Hide suggestions after first user message
+  const suggestions = document.getElementById('siriSuggestions');
+  if (suggestions) suggestions.style.display = 'none';
+
+  addSiriMessage('user', msg);
+
+  // Check if user is entering a Groq key (starting with gsk_)
+  if (msg.startsWith('gsk_') && msg.length > 30) {
+    GROQ_API_KEY = msg;
+    localStorage.setItem('GROQ_API_KEY', msg);
+    addSiriMessage('ai', '✅ Groq API key set successfully! You can now start asking questions.');
+    return;
+  }
+
+  const currentUserMsg = { role: 'user', content: msg };
+  const typingId = addSiriTyping();
+
+  if (!GROQ_API_KEY) {
+    removeTyping(typingId);
+    addSiriMessage('ai', '⚠️ Groq API key is missing. Please create a `.env` file containing `GROQ_API_KEY` in the project root, or paste your Groq API key (starting with `gsk_`) directly here to set it.');
+    return;
+  }
+
+  try {
+    const reply = await callGroqAPI([...siriHistory, currentUserMsg]);
+    removeTyping(typingId);
+    addSiriMessage('ai', reply);
+    siriHistory.push(currentUserMsg);
+    siriHistory.push({ role: 'assistant', content: reply });
+    // Keep history to last 20 messages to avoid token overflow
+    if (siriHistory.length > 20) siriHistory = siriHistory.slice(-20);
+  } catch (err) {
+    removeTyping(typingId);
+    addSiriMessage('ai', `⚠️ API Error: ${err.message}`);
+  }
+}
+
+async function callGroqAPI(history) {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: SIRI_SYSTEM_PROMPT },
+        ...history
+      ],
+      max_tokens: 300,
+      temperature: 0.7
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content?.trim() || "Sorry, I couldn't process that. Try asking again!";
+}
+
+function addSiriMessage(role, text) {
+  const container = document.getElementById('siriMessages');
+  if (!container) return;
+  const wrap = document.createElement('div');
+  wrap.className = `siri-msg ${role}`;
+  wrap.innerHTML = `<div class="siri-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addSiriTyping() {
+  const id = ++_typingId;
+  const container = document.getElementById('siriMessages');
+  if (!container) return id;
+  const wrap = document.createElement('div');
+  wrap.className = 'siri-msg ai';
+  wrap.id = `siri-typing-${id}`;
+  wrap.innerHTML = `<div class="siri-bubble siri-typing"><span class="siri-dot"></span><span class="siri-dot"></span><span class="siri-dot"></span></div>`;
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  document.getElementById(`siri-typing-${id}`)?.remove();
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && siriOpen) closeSiri();
+});
+
+// Close when clicking outside the panel
+document.addEventListener('mousedown', e => {
+  if (!siriOpen) return;
+  const panel = document.getElementById('siriPanel');
+  const btn = document.getElementById('siriBtn');
+  if (!panel?.contains(e.target) && !btn?.contains(e.target)) closeSiri();
 });
