@@ -76,7 +76,7 @@ This project aims to:
 ## 📸 Preview
 
 <img width="2940" height="1676" alt="image" src="https://github.com/user-attachments/assets/9dadb22a-5cac-4bfc-8368-b824552e189c" />
-<img width="2940" height="1654" alt="image" src="https://github.com/user-attachments/assets/0fc74b51-6444-4f01-b133-b794f215172c" />
+<img width="2940" height="1668" alt="image" src="https://github.com/user-attachments/assets/d202cccf-72b3-47dd-88bd-55c76dbbd728" />
 
 
 omgawde.netlify.app
