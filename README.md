@@ -40,7 +40,7 @@ Instead of a traditional website, this portfolio mimics a desktop environment wi
 - Experience (Notes-style)
 - Resume (Preview-style)
 - Contact (Mail-style)
-
+- Music (Apple Music)
 ---
 
 ## 🚀 Tech Stack
