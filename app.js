@@ -2042,12 +2042,6 @@ async function sendSiriMessage() {
   const currentUserMsg = { role: 'user', content: msg };
   const typingId = addSiriTyping();
 
-  if (!GROQ_API_KEY) {
-    removeTyping(typingId);
-    addSiriMessage('ai', '⚠️ Groq API key is missing. Please create a `.env` file containing `GROQ_API_KEY` in the project root, or paste your Groq API key (starting with `gsk_`) directly here to set it.');
-    return;
-  }
-
   try {
     const reply = await callGroqAPI([...siriHistory, currentUserMsg]);
     removeTyping(typingId);
@@ -2063,6 +2057,47 @@ async function sendSiriMessage() {
 }
 
 async function callGroqAPI(history) {
+  // 1. Try Netlify function proxy first
+  try {
+    const res = await fetch('/.netlify/functions/siri', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: SIRI_SYSTEM_PROMPT },
+          ...history
+        ],
+        max_tokens: 300,
+        temperature: 0.7
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content?.trim() || "Sorry, I couldn't process that. Try asking again!";
+    }
+
+    // If it's a 404 (not running on Netlify, e.g. local simple server), fall back to local direct call.
+    // If it's an error from the function (e.g. 500 missing key), propagate or let it fall back.
+    if (res.status !== 404) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error || `HTTP ${res.status}`);
+    }
+  } catch (err) {
+    // If fetch failed completely or returned 404, we fallback to direct Groq API call if key is present
+    if (err.message && !err.message.includes('404') && !err.message.includes('Failed to fetch') && !err.message.includes('fetch failed')) {
+      throw err;
+    }
+  }
+
+  // 2. Fallback to direct Groq API (requires local/session key)
+  if (!GROQ_API_KEY) {
+    throw new Error('Groq API key is missing. Please create a `.env` file containing `GROQ_API_KEY` in the project root, or paste your Groq API key (starting with `gsk_`) directly here to set it.');
+  }
+
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
