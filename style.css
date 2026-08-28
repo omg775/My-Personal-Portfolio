@@ -4006,6 +4006,56 @@ body::after {
     gap: 15px;
   }
 
+  /* About/Safari hero: stack image above text instead of a fixed-width row */
+  .safari-start-page {
+    padding: 28px 20px 36px;
+  }
+
+  .safari-hero-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    max-width: 100%;
+  }
+
+  .safari-profile-img {
+    width: 120px;
+    flex: 0 0 auto;
+  }
+
+  .safari-hero-text {
+    align-items: center;
+  }
+
+  .safari-hero-titles h2 {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+  }
+
+  .safari-chips,
+  .safari-actions {
+    justify-content: center;
+  }
+
+  /* Arcade game: kaboom's canvas fills its container at 100%/100%, which
+     stretches the 720x400 game world into the tall, narrow mobile window.
+     Constrain just the canvas to the game's aspect ratio and center it,
+     leaving start/end overlays filling the full container as before. */
+  .arcade-game-area canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 100% !important;
+    aspect-ratio: 9 / 5 !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+
+  /* Siri panel: fixed 360px overflowed narrow phones; scale with viewport */
+  .siri-panel {
+    width: clamp(260px, calc(100vw - 24px), 360px);
+    right: 12px;
+  }
+
   /* Dock Centering Fix */
   .dock-shell {
     position: fixed;
